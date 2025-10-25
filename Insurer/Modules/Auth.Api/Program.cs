@@ -1,4 +1,5 @@
 using Auth.Api.Data;
+using Auth.Api.Interfaces;
 using Auth.Api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -7,7 +8,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
-
 builder.Services.AddControllers();
 
 builder.Services.AddDbContext<AuthDbContext>(e =>
@@ -39,6 +39,12 @@ builder.Services.AddAuthentication(options =>
   });
 
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<JwtTokenGenerator>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IUserContextAccessor, IUserContextAccessor>();
+
+builder.Services.Configure<JwtOptions>(
+    builder.Configuration.GetSection("Jwt"));
 
 builder.Services.AddAuthorization();
 

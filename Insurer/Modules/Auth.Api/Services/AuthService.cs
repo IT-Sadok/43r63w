@@ -1,72 +1,49 @@
-﻿using Auth.Api.Data;
-using Auth.Api.Dtos;
-using Auth.Api.Mapping;
+﻿using Auth.Api.Interfaces;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 
 namespace Auth.Api.Services;
 
 public class AuthService(
     UserManager<IdentityUser> userManager,
-    IConfiguration configuration)
+    JwtTokenGenerator jwtTokenGenerator,
+    IUserContextAccessor userContextAccessor) : IAuthService
 {
-    public async Task<bool> RegisterAsync(RegisterDto registerDto)
+    public async Task<Result<bool>> RegisterAsync(RegisterDto registerDto, CancellationToken cancellationToken)
     {
         var user = registerDto.ToEntity();
         var result = await userManager.CreateAsync(user, registerDto.Password);
-        return result.Succeeded;
+        return Result<bool>.Success(result.Succeeded);
     }
-    public async Task<string?> LoginAsync(LoginDto loginDto)
+    public async Task<Result<string>> LoginAsync(LoginDto loginDto, CancellationToken cancellationToken)
     {
         var user = await userManager.FindByNameAsync(loginDto.UserName);
         if (user is null)
-            return null;
+            return Result<string>.Failure($"User not found");
 
         var result = await userManager.CheckPasswordAsync(user, loginDto.Password);
 
         if (!result)
-            return null;
+            return Result<string>.Failure($"Password didn`t match");
 
-        return await GenerateTokenAsync(user);
+        var token = jwtTokenGenerator.GenerateToken(user);
+        return token.IsSuccess == true
+            ? Result<string>.Success(token.Value!)
+            : Result<string>.Failure("Something went wrong");
     }
 
-    public async Task<string> GenerateTokenAsync(IdentityUser user)
+    public async Task<Result<UserDto>> GetMeAsync()
     {
-        var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.NameIdentifier,user.Id),
-            new Claim(ClaimTypes.Name,user.UserName!),
-            new Claim(ClaimTypes.Role,"Admin"),
-            user.Email is null
-              ? new Claim(ClaimTypes.MobilePhone,user.PhoneNumber!)
-              : new Claim(ClaimTypes.Email,user.Email),
-        };
+        var userId = userContextAccessor.UserId;
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetValue<string>("Jwt:Key")!));
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        if (string.IsNullOrEmpty(userId))
+            return Result<UserDto>.Failure("User not found");
 
-
-        var securityToken = new JwtSecurityToken(
-            claims: claims,
-            signingCredentials: creds,
-            expires: DateTime.Now.AddMinutes(10),
-            issuer: configuration.GetValue<string>("Jwt:Issuer"),
-            audience: configuration.GetValue<string>("Jwt:Audience")
-            );
-
-        return new JwtSecurityTokenHandler().WriteToken(securityToken);
-    }
-    public async Task<UserDto> GetMeAsync(string userId)
-    {
         var user = await userManager.FindByIdAsync(userId);
 
         if (user == null)
-            throw new Exception("User not found");
+            return Result<UserDto>.Failure("User not found");
 
-        return user.ToDto();
+        return Result<UserDto>.Success(user.ToDto());
     }
 
 }

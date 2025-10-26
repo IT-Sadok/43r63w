@@ -33,12 +33,12 @@ public class AuthService(
 
     public async Task<Result<UserDto>> GetMeAsync()
     {
-        var userId = userContextAccessor.UserId;
+        var userId = userContextAccessor.GetUserContext();
 
-        if (string.IsNullOrEmpty(userId))
+        if (string.IsNullOrEmpty(userId.UserId))
             return Result<UserDto>.Failure("User not found");
 
-        var user = await userManager.FindByIdAsync(userId);
+        var user = await userManager.FindByIdAsync(userId.UserId);
 
         if (user == null)
             return Result<UserDto>.Failure("User not found");

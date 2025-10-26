@@ -416,3 +416,15 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+
+# Ignore appsettings in all subprojects
+**/appsettings*.json
+
+# Ignore IDE settings
+.idea/
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates

@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/Modules/" />
+  <Folder Name="/Modules/Auth/">
+    <Project Path="../Modules/Auth.Api/Auth.Api.csproj" Id="b4f57f32-9985-4a5d-9ab0-d62e0fb7d50c" />
+  </Folder>
+  <Project Path="Insurer.Host.csproj" />
+</Solution>

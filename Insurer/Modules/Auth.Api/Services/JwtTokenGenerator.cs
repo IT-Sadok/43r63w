@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Shared.Results;
 
 namespace Auth.Api.Services;
 
@@ -19,9 +20,6 @@ public class JwtTokenGenerator(IOptions<JwtOptions> options) : IJwtTokenGenerato
             new Claim(ClaimTypes.NameIdentifier,user.Id),
             new Claim(ClaimTypes.Name,user.UserName!),
             new Claim(ClaimTypes.Role,"Admin"),
-            user.Email is null
-              ? new Claim(ClaimTypes.MobilePhone,user.PhoneNumber!)
-              : new Claim(ClaimTypes.Email,user.Email),
         };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.Key!));

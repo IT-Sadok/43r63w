@@ -2,7 +2,7 @@
 
 namespace Auth.Api.Dtos;
 
-public sealed class LoginDto
+public sealed class LoginModel
 {
     public string UserName { get; set; } = null!;
     public string PhoneNumber { get; set; } = null!;

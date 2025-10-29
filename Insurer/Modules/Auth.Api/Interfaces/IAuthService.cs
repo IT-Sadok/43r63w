@@ -1,9 +1,11 @@
-﻿namespace Auth.Api.Interfaces
+﻿using Shared.Results;
+
+namespace Auth.Api.Interfaces
 {
     public interface IAuthService
     {
-        Task<Result<UserDto>> GetMeAsync();
-        Task<Result<string>> LoginAsync(LoginDto loginDto, CancellationToken cancellationToken);
-        Task<Result<bool>> RegisterAsync(RegisterDto registerDto, CancellationToken cancellationToken);
+        Task<Result<UserModel>> GetMeAsync();
+        Task<Result<string>> LoginAsync(LoginModel loginDto, CancellationToken cancellationToken);
+        Task<Result<bool>> RegisterAsync(RegisterModel registerDto, CancellationToken cancellationToken);
     }
 }

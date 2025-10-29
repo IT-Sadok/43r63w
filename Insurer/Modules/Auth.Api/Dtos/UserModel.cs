@@ -1,6 +1,6 @@
 ﻿namespace Auth.Api.Dtos;
 
-public sealed class UserDto
+public sealed class UserModel
 {
     public string Id { get; set; } = null!;
     public string UserName { get; set; } = null!;

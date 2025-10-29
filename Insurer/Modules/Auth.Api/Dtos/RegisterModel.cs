@@ -2,7 +2,7 @@
 
 namespace Auth.Api.Dtos;
 
-public sealed class RegisterDto
+public sealed class RegisterModel
 {
     [Required]
     public string UserName { get; set; } = null!;

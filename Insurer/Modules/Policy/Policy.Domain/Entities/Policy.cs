@@ -16,7 +16,7 @@ public class Policy
 
     public int AgentId { get; set; }
 
-    public string PolicyType { get; set; } = null!;
+    public PolicyType PolicyType { get; set; }
 
     public decimal CoverageAmount { get; set; }
 
@@ -28,7 +28,11 @@ public class Policy
 
     public PolicyStatus Status { get; set; } = PolicyStatus.Active;
 
-    public List<PolicyClaim> PolicyClaims { get; set; } = new();
+    public List<PolicyClaim> PolicyClaims { get; set; } = [];
 
     public List<Document> Documents { get; set; } = [];
+
+    public List<PolicyHistory> PolicyHistories { get; set; } = [];
+
+    public List<Payment> Payments { get; set; } = [];
 }

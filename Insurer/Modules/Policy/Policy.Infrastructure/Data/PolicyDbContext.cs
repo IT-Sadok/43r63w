@@ -1,10 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Policy.Domain.Entities;
-
-namespace Policy.Infrastructure.Data;
+﻿namespace Policy.Infrastructure.Data;
 
 public class PolicyDbContext : DbContext
-{    
+{
     public PolicyDbContext(DbContextOptions<PolicyDbContext> options) : base(options)
     {
     }
@@ -23,5 +20,7 @@ public class PolicyDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.HasDefaultSchema("policy");
+
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(PolicyDbContext).Assembly);
     }
 }

@@ -8,4 +8,6 @@ public class Document
     public string FileName { get; set; } = null!;
     public string FileType { get; set; } = null!;
     public DateTime UploadedDate { get; set; }
+    public Policy? Policy { get; set; }
+    public PolicyClaim? PolicyClaim { get; set; }
 }

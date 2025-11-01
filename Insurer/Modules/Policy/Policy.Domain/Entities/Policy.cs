@@ -1,8 +1,6 @@
-﻿
-using Policy.Domain.Enums;
+﻿using Policy.Domain.Enums;
 
 namespace Policy.Domain.Entities;
-
 
 public class Policy
 {

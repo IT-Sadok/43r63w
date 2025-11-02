@@ -13,6 +13,6 @@ internal class PolicyHistory : IEntityTypeConfiguration<Policy.Domain.Entities.P
         builder.HasOne<Domain.Entities.Policy>()
             .WithMany(p => p.PolicyHistories)
             .HasForeignKey(fk => fk.PolicyId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

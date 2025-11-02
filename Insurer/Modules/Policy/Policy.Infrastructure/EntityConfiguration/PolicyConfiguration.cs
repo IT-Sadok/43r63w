@@ -22,12 +22,12 @@ internal class PolicyConfiguration : IEntityTypeConfiguration<Policy.Domain.Enti
         builder.HasMany(p => p.Documents)
             .WithOne(d => d.Policy)
             .HasForeignKey(d => d.PolicyId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasMany(p => p.PolicyClaims)
             .WithOne(pc => pc.Policy)
             .HasForeignKey(fk => fk.PolicyId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
 
 
         builder.HasIndex(i => i.PolicyNumber)

@@ -1,6 +1,5 @@
 ﻿using Policy.Domain.Enums;
 namespace Policy.Domain.Entities;
-
 public class PolicyClaim
 {
     public int Id { get; set; }
@@ -20,7 +19,7 @@ public class PolicyClaim
     public DateTime? DecisionDate { get; set; }
 
     public List<Document> Documents { get; set; } = [];
-
-    public List<Payment> Payments { get; set; } = [];
     public Policy Policy { get; set; } = null!;
+
+    public List<CompanyPayment> CompanyPayments { get; set; } = [];
 }

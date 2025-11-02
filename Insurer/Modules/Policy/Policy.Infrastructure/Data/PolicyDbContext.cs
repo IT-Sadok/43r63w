@@ -14,7 +14,9 @@ public class PolicyDbContext : DbContext
 
     public DbSet<Document> Documents { get; set; }
 
-    public DbSet<Payment> Payments { get; set; }
+    public DbSet<UserPayment> UserPayments { get; set; }
+
+    public DbSet<CompanyPayment> CompanyPayments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -22,5 +24,9 @@ public class PolicyDbContext : DbContext
         modelBuilder.HasDefaultSchema("policy");
 
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(PolicyDbContext).Assembly);
+
+        modelBuilder.HasSequence<int>("PolicyNumbers", schema: "policy")
+            .StartsAt(1000)
+            .IncrementsBy(1);
     }
 }

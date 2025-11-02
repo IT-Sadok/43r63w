@@ -32,5 +32,5 @@ public class Policy
 
     public List<PolicyHistory> PolicyHistories { get; set; } = [];
 
-    public List<Payment> Payments { get; set; } = [];
+    public List<UserPayment> UserPayments { get; set; } = [];
 }

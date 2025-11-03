@@ -1,16 +1,16 @@
 <Solution>
   <Folder Name="/Modules/" />
   <Folder Name="/Modules/Auth/">
-    <Project Path="D:/Repositories/Mentoring/Insurer/Modules/Auth.Api/Auth.Api.csproj" Id="b4f57f32-9985-4a5d-9ab0-d62e0fb7d50c" />
+    <Project Path="../Modules/Auth.Api/Auth.Api.csproj" />
   </Folder>
   <Folder Name="/Modules/Policy/">
-    <Project Path="D:/Repositories/Mentoring/Insurer/Modules/Policy/Policy.Application/Policy.Application.csproj" Id="ee001bba-d4a5-40ae-af6a-2ec31f92eb24" />
-    <Project Path="D:/Repositories/Mentoring/Insurer/Modules/Policy/Policy.Bootstrapper/Policy.Bootstrapper.csproj" Id="6a622763-33c0-49bd-a6cd-20f745d2c5c5" />
-    <Project Path="D:/Repositories/Mentoring/Insurer/Modules/Policy/Policy.Domain/Policy.Domain.csproj" Id="891d9cfa-e394-4684-bad7-a8f23665472a" />
-    <Project Path="D:/Repositories/Mentoring/Insurer/Modules/Policy/Policy.Infrastructure/Policy.Infrastructure.csproj" Id="dc9f1177-1e87-4004-b3f5-a97d34daf015" />
+    <Project Path="../Modules/Policy/Policy.Application/Policy.Application.csproj" />
+    <Project Path="../Modules/Policy/Policy.Bootstrapper/Policy.Bootstrapper.csproj" />
+    <Project Path="../Modules/Policy/Policy.Domain/Policy.Domain.csproj" />
+    <Project Path="../Modules/Policy/Policy.Infrastructure/Policy.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/Shared/">
-    <Project Path="D:/Repositories/Mentoring/Insurer/Shared/Shared/Shared.csproj" Id="ac593b72-467f-42fd-b61c-0c020e8b0206" />
+    <Project Path="../Shared/Shared/Shared.csproj" />
   </Folder>
-  <Project Path="D:/Repositories/Mentoring/Insurer/Insurer.Host/Insurer.Host.csproj" />
+  <Project Path="Insurer.Host.csproj" />
 </Solution>

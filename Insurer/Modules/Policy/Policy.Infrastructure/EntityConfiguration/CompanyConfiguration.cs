@@ -9,6 +9,6 @@ internal class CompanyConfiguration : IEntityTypeConfiguration<CompanyPayment>
        builder.HasOne(p => p.Claim)
               .WithMany(p => p.CompanyPayments)
               .HasForeignKey(fk => fk.ClaimId)
-              .OnDelete(DeleteBehavior.Restrict);
+              .OnDelete(DeleteBehavior.Cascade);
     }
 }

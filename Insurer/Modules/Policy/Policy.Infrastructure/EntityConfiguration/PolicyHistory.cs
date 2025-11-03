@@ -1,7 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-
-namespace Policy.Infrastructure.EntityConfiguration;
+﻿namespace Policy.Infrastructure.EntityConfiguration;
 
 internal class PolicyHistory : IEntityTypeConfiguration<Policy.Domain.Entities.PolicyHistory>
 {

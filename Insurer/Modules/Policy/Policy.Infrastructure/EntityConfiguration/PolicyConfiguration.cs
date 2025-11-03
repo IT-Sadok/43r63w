@@ -2,7 +2,7 @@
 
 namespace Policy.Infrastructure.EntityConfiguration;
 
-internal class PolicyConfiguration : IEntityTypeConfiguration<Policy.Domain.Entities.Policy>
+internal class PolicyConfiguration : IEntityTypeConfiguration<Domain.Entities.Policy>
 {
     public void Configure(EntityTypeBuilder<Domain.Entities.Policy> builder)
     {
@@ -27,7 +27,7 @@ internal class PolicyConfiguration : IEntityTypeConfiguration<Policy.Domain.Enti
         builder.HasMany(p => p.PolicyClaims)
             .WithOne(pc => pc.Policy)
             .HasForeignKey(fk => fk.PolicyId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
 
         builder.HasIndex(i => i.PolicyNumber)

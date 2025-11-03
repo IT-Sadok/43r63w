@@ -1,4 +1,6 @@
-﻿namespace Policy.Infrastructure.Data;
+﻿using Policy.Domain.Entities;
+
+namespace Policy.Infrastructure.Data;
 
 public class PolicyDbContext : DbContext
 {

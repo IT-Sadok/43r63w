@@ -12,13 +12,7 @@ internal class PolicyConfiguration : IEntityTypeConfiguration<Domain.Entities.Po
         builder.Property(p => p.PolicyNumber)
                .IsRequired()
                .HasMaxLength(50);
-
-
-        builder.Property(p => p.PolicyNumber)
-            .IsRequired()
-            .HasMaxLength(50);
-
-
+        
         builder.HasMany(p => p.Documents)
             .WithOne(d => d.Policy)
             .HasForeignKey(d => d.PolicyId)

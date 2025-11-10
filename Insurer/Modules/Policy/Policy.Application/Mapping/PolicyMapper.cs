@@ -5,7 +5,7 @@ namespace Policy.Application.Mapping;
 
 public static class PolicyMapper
 {
-    public static PolicyModel ToDto(this Policy.Domain.Entities.Policy entity)
+    public static PolicyModel ToModel(this Policy.Domain.Entities.Policy entity)
     {
         return new PolicyModel
         {

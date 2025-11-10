@@ -25,6 +25,7 @@ internal sealed class PolicyService(
             .Sort(sortParams)
             .Paging(paginationParams)
             .Select(e => e.ToDto())
+            .Select(e => e.ToModel())
             .ToListAsync(cancellationToken);
 
         var totalCount = await policyDbContext.Policies.CountAsync(cancellationToken);
@@ -48,7 +49,7 @@ internal sealed class PolicyService(
             e => e.Id == model.PolicyId, cancellationToken);
 
         if (policy == null)
-            return Result<PolicyModel>.Failure("Policy isn`t exist");
+            return Result<PolicyModel>.Failure(ErrorsMessage.EntityError);
 
         var policyModel = policy.ToDto();
 
@@ -72,40 +73,40 @@ internal sealed class PolicyService(
         CreatePolicyModel model,
         CancellationToken cancellationToken = default)
     {
-        var policyNum = await policyDbContext.Database
-            .SqlQueryRaw<int>("nextval(policy.PolicyNumbers)")
-            .SingleAsync(cancellationToken);
-
-        var policyNumber = $"TestCompany-{nameof(PolicyType.Vehicle)}-{policyNum}";
+        var validate = await createPolicyModelValidator.ValidateAsync(model, cancellationToken);
+        if (!validate.IsValid)
+            return Result<bool>.Failure(
+                errorMessage: ErrorsMessage.ValidationError,
+                errors: validate.Errors.ToDictionary(k => k.PropertyName, v => v.ErrorMessage));
 
         var policy = new Policy.Domain.Entities.Policy
         {
-            PolicyNumber = policyNumber,
-            AgentId = 1,
-            CompanyId = 1,
-            CustomerId = 1,
+            PolicyNumber = model.PolicyNumber,
+            AgentId = IdPlaceholder.AgentId,
+            CompanyId = IdPlaceholder.CompanyId,
+            CustomerId = IdPlaceholder.CustomerId,
+            PolicyType = model.PolicyType,
             CoverageAmount = model.CoverageAmount,
             PremiumAmount = model.PremiumAmount,
             StartDate = model.StartDate,
             EndDate = model.EndDate,
             Status = PolicyStatus.Pending,
+            UserPayments =
+            [
+                new UserPayment
+                {
+                    Amount = model.UserPaymentsModel.Amount,
+                    PaymentDate = DateTime.Now,
+                    Status = PaymentStatus.Accepted,
+                    Notes = model.UserPaymentsModel.Notes,
+                }
+            ]
         };
+
+        policy.Status = PolicyStatus.Active;
 
         policyDbContext.Add(policy);
         await policyDbContext.SaveChangesAsync(cancellationToken);
-
-        var payment = new UserPayment
-        {
-            PolicyId = policy.Id,
-            Amount = model.UserPaymentsModel.Amount,
-            PaymentDate = DateTime.Now,
-            Status = PaymentStatus.Accepted,
-            Notes = model.UserPaymentsModel.Notes,
-        };
-
-        policyDbContext.Add(payment);
-        await policyDbContext.SaveChangesAsync(cancellationToken);
-        policy.Status = PolicyStatus.Active;
 
         return Result<bool>.Success(true);
     }

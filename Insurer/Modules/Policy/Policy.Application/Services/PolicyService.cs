@@ -25,6 +25,7 @@ internal sealed class PolicyService(
         CancellationToken cancellationToken = default)
     {
         var policies = await policyDbContext.Policies
+            .AsNoTracking()
             .Filter(request)
             .Sort(sortParams)
             .Paging(request.PageSize, request.Page)
@@ -48,8 +49,10 @@ internal sealed class PolicyService(
         GetPolicyModel model,
         CancellationToken cancellationToken = default)
     {
-        var policy = await policyDbContext.Policies.FirstOrDefaultAsync(
-            e => e.Id == model.Id, cancellationToken);
+        var policy = await policyDbContext.Policies
+            .AsNoTracking()
+            .FirstOrDefaultAsync(e => e.Id == model.Id, cancellationToken);
+
 
         if (policy == null)
             return Result<PolicyModel>.Failure(ErrorsMessage.EntityError);
@@ -89,6 +92,15 @@ internal sealed class PolicyService(
                     PaymentDate = DateTime.Now,
                     Status = PaymentStatus.Accepted,
                     Notes = model.UserPaymentsModel.Notes,
+                }
+            ],
+            PolicyHistories = 
+            [
+                new PolicyHistory
+                {
+                    ChangeDate = DateTime.Now,
+                    ChangedBy = IdPlaceholder.Author,
+                    ChangeType = ChangeType.PolicyCreated
                 }
             ]
         };
@@ -146,4 +158,28 @@ internal sealed class PolicyService(
             ? Result<bool>.Success(true)
             : Result<bool>.Success(false);
     }
+
+
+    public async Task<Result<decimal>> CalculatePremiumAmountAsync(
+        int policyId,
+        CancellationToken cancellationToken = default)
+    {
+        var policy = await policyDbContext.Policies
+            .AsNoTracking()
+            .FirstOrDefaultAsync(e => e.Id == policyId, cancellationToken);
+
+        if (policy == null)
+            return Result<decimal>.Failure(ErrorsMessage.EntityError);
+
+        var totalDays = (policy.EndDate - policy.StartDate).TotalDays + 1;
+        var passed = (DateTime.UtcNow - policy.StartDate).TotalDays;
+
+        if (passed == 0)
+            return Result<decimal>.Success(0);
+
+        var result = (decimal)(passed / totalDays) * policy.PremiumAmount;
+
+        return Result<decimal>.Success(result);
+    }
+    
 }

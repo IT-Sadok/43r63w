@@ -14,11 +14,11 @@ public static class PolicyEndpoints
     {
         var group = app.MapGroup("/policy").RequireAuthorization();
 
-        group.MapPost("/create", CreatePolicyAsync);
-        group.MapGet("/get/{id:int}", GetPolicyAsync);
-        group.MapGet("/get", GetPoliciesAsync);
-        group.MapPut("/update", UpdatePolicyAsync);
-        group.MapDelete("/delete/{id:int}", DeletePolicyAsync);
+        group.MapPost("", CreatePolicyAsync);
+        group.MapGet("/{id:int}", GetPolicyAsync);
+        group.MapGet("", GetPoliciesAsync);
+        group.MapPut("", UpdatePolicyAsync);
+        group.MapDelete("/{id:int}", DeletePolicyAsync);
     }
 
     private static async Task<IResult> CreatePolicyAsync(
@@ -38,7 +38,7 @@ public static class PolicyEndpoints
         var result = await policyService.CreatePolicyAsync(model, cancellationToken);
 
         return result.IsSuccess
-            ? Results.Ok("Succeeded")
+            ? Results.CreatedAtRoute()
             : Results.BadRequest(result.Errors);
     }
 
@@ -74,7 +74,7 @@ public static class PolicyEndpoints
         model.UserName = user.UserName!;
         var result = await policyService.UpdatePolicyAsync(model, cancellationToken);
         return result.IsSuccess
-            ? Results.Ok(result.Value)
+            ? Results.NoContent()
             : Results.BadRequest(result.ErrorMessage);
     }
 
@@ -86,7 +86,7 @@ public static class PolicyEndpoints
     {
         var result = await policyService.DeletePolicyAsync(id, cancellationToken);
         return result.IsSuccess
-            ? Results.Ok(result.Value)
+            ? Results.NoContent()
             : Results.BadRequest();
     }
 }

@@ -38,11 +38,11 @@ public static class PolicyExstension
         return query;
     }
 
-    public static IQueryable<Domain.Entities.Policy> Paging(this IQueryable<Domain.Entities.Policy> query, PagingParams pagingParams)
+    public static IQueryable<Domain.Entities.Policy> Paging(
+        this IQueryable<Domain.Entities.Policy> query,
+        int pageSize,
+        int page)
     {
-        var page = pagingParams.Page ?? 1;
-        var pageSize = pagingParams.PageSize ?? 10;
-
         return query
             .Skip((page - 1) * pageSize)
             .Take(pageSize);
@@ -50,8 +50,8 @@ public static class PolicyExstension
 
 
     public static IQueryable<Domain.Entities.Policy> Sort(
-       this IQueryable<Domain.Entities.Policy> query,
-       SortParams sortParams)
+        this IQueryable<Domain.Entities.Policy> query,
+        SortParams sortParams)
     {
         return sortParams.SortDirection == SortDirection.Descending
             ? query.OrderByDescending(KeySelector(sortParams.OrderBy))
@@ -69,7 +69,6 @@ public static class PolicyExstension
             nameof(Policy.Domain.Entities.Policy.PremiumAmount) => s => s.PremiumAmount,
             _ => s => s.StartDate,
         };
-
     }
 }
 
@@ -84,10 +83,4 @@ public sealed class PolicyFilter : PaginationRequest
     public DateTime? EndDate { get; set; }
 
     public PolicyStatus? Status { get; set; }
-}
-
-public sealed class PagingParams
-{
-    public int? PageSize { get; set; }
-    public int? Page { get; set; }
 }

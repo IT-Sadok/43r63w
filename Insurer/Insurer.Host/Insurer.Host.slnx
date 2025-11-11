@@ -1,7 +1,10 @@
 <Solution>
   <Folder Name="/Modules/" />
   <Folder Name="/Modules/Auth/">
-    <Project Path="../Modules/Auth.Api/Auth.Api.csproj" />
+    <Project Path="..\Modules\Auth\Auth.Bootstrapper\Auth.Bootstrapper.csproj" />
+    <Project Path="..\Modules\Auth\Auth.Application\Auth.Application.csproj" />
+    <Project Path="..\Modules\Auth\Auth.Domain\Auth.Domain.csproj" />
+    <Project Path="..\Modules\Auth\Auth.Infrastructure\Auth.Infrastructure.csproj"/>
   </Folder>
   <Folder Name="/Modules/Policy/">
     <Project Path="../Modules/Policy/Policy.Application/Policy.Application.csproj" />

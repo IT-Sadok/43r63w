@@ -11,4 +11,8 @@
     <ProjectReference Include="..\Policy.Infrastructure\Policy.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.0" />
+  </ItemGroup>
+
 </Project>

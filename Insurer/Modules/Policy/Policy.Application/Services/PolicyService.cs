@@ -1,10 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using Policy.Application.Dtos;
 using Policy.Application.FilterExstension;
 using Policy.Application.Mapping;
+using Policy.Application.Placeholders;
 using Policy.Domain.Entities;
 using Policy.Domain.Enums;
 using Policy.Infrastructure.Data;
+using Shared.Errors;
 using Shared.Pagination;
 using Shared.Results;
 using Shared.Sorted;
@@ -12,29 +15,30 @@ using Shared.Sorted;
 namespace Policy.Application.Services;
 
 internal sealed class PolicyService(
+    IValidator<CreatePolicyModel> createPolicyModelValidator,
+    IValidator<PolicyUpdateModel> updatePolicyModelValidator,
     PolicyDbContext policyDbContext)
 {
     public async Task<Result<PaginationResponse<PolicyModel>>> GetPoliciesAsync(
         PolicyFilter request,
         SortParams sortParams,
-        PagingParams paginationParams,
         CancellationToken cancellationToken = default)
     {
         var policies = await policyDbContext.Policies
+            .AsNoTracking()
             .Filter(request)
             .Sort(sortParams)
-            .Paging(paginationParams)
-            .Select(e => e.ToDto())
+            .Paging(request.PageSize, request.Page)
             .Select(e => e.ToModel())
             .ToListAsync(cancellationToken);
 
         var totalCount = await policyDbContext.Policies.CountAsync(cancellationToken);
 
-        var totalPage = (int)Math.Round(totalCount / (double)(paginationParams.PageSize ?? 1));
+        var totalPage = (int)Math.Round(totalCount / (double)(request.PageSize));
 
         return Result<PaginationResponse<PolicyModel>>.Success(new PaginationResponse<PolicyModel>(
-            pageSize: request.Page,
-            page: request.PageSize,
+            pageSize: request.PageSize,
+            page: request.Page,
             totalCount: totalCount,
             totalPages: totalPage,
             items: policies)
@@ -45,28 +49,17 @@ internal sealed class PolicyService(
         GetPolicyModel model,
         CancellationToken cancellationToken = default)
     {
-        var policy = await policyDbContext.Policies.FirstOrDefaultAsync(
-            e => e.Id == model.PolicyId, cancellationToken);
+        var policy = await policyDbContext.Policies
+            .AsNoTracking()
+            .FirstOrDefaultAsync(e => e.Id == model.Id, cancellationToken);
+
 
         if (policy == null)
             return Result<PolicyModel>.Failure(ErrorsMessage.EntityError);
 
-        var policyModel = policy.ToDto();
-
-        if (policyModel == null)
-            return Result<PolicyModel>.Failure("Can`t mapped policy");
+        var policyModel = policy.ToModel();
 
         return Result<PolicyModel>.Success(policyModel!);
-    }
-
-    public async Task GetDetailAsync()
-    {
-        var response = await GetPolicyAsync(new GetPolicyModel
-        {
-            PolicyId = 123,
-        });
-
-        await Task.FromResult(response);
     }
 
     public async Task<Result<bool>> CreatePolicyAsync(
@@ -100,6 +93,15 @@ internal sealed class PolicyService(
                     Status = PaymentStatus.Accepted,
                     Notes = model.UserPaymentsModel.Notes,
                 }
+            ],
+            PolicyHistories = 
+            [
+                new PolicyHistory
+                {
+                    ChangeDate = DateTime.Now,
+                    ChangedBy = IdPlaceholder.Author,
+                    ChangeType = ChangeType.PolicyCreated
+                }
             ]
         };
 
@@ -112,13 +114,19 @@ internal sealed class PolicyService(
     }
 
     public async Task<Result<bool>> UpdatePolicyAsync(
-       PolicyUpdateModel model,
-       CancellationToken cancellationToken = default)
+        PolicyUpdateModel model,
+        CancellationToken cancellationToken = default)
     {
+        var validate = await updatePolicyModelValidator.ValidateAsync(model, cancellationToken);
+        if (!validate.IsValid)
+            return Result<bool>.Failure(
+                errorMessage: ErrorsMessage.ValidationError,
+                errors: validate.Errors.ToDictionary(k => k.PropertyName, v => v.ErrorMessage));
+
         var policyChange = new PolicyHistoryModel
         {
             ChangeType = ChangeType.PolicyUpdated,
-            ChangedBy = "TestUser",
+            ChangedBy = model.UserName,
             ChangeDate = DateTime.Now,
             OldValue = model.PolicyHistoryModel.OldValue,
             NewValue = model.PolicyHistoryModel.NewValue,
@@ -130,23 +138,48 @@ internal sealed class PolicyService(
 
         var affected = await policyDbContext.Policies
             .Where(e => e.Id == model.PolicyId
-            && e.Status != PolicyStatus.Cancelled
-            && e.UserPayments.Any())
+                        && e.Status != PolicyStatus.Cancelled
+                        && e.UserPayments.Any())
             .ExecuteUpdateAsync(up => up
-            .SetProperty(p => p.Status, _ => model.PolicyStatus), cancellationToken);
+                .SetProperty(p => p.Status, _ => model.PolicyStatus), cancellationToken);
 
-        if (affected == 0)
-            return Result<bool>.Failure("Something went wrong,try again");
-
-        return Result<bool>.Success(true);
+        return affected == 0
+            ? Result<bool>.Failure("Something went wrong,try again")
+            : Result<bool>.Success(true);
     }
 
     public async Task<Result<bool>> DeletePolicyAsync(int policyId, CancellationToken cancellationToken)
     {
-        var result = await policyDbContext.Policies.Where(e => e.Id == policyId).ExecuteDeleteAsync(cancellationToken);
+        var result = await policyDbContext.Policies
+            .Where(e => e.Id == policyId)
+            .ExecuteDeleteAsync(cancellationToken);
 
         return result > 0
-             ? Result<bool>.Success(true)
-             : Result<bool>.Success(false);
+            ? Result<bool>.Success(true)
+            : Result<bool>.Success(false);
     }
+
+
+    public async Task<Result<decimal>> CalculatePremiumAmountAsync(
+        int policyId,
+        CancellationToken cancellationToken = default)
+    {
+        var policy = await policyDbContext.Policies
+            .AsNoTracking()
+            .FirstOrDefaultAsync(e => e.Id == policyId, cancellationToken);
+
+        if (policy == null)
+            return Result<decimal>.Failure(ErrorsMessage.EntityError);
+
+        var totalDays = (policy.EndDate - policy.StartDate).TotalDays + 1;
+        var passed = (DateTime.UtcNow - policy.StartDate).TotalDays;
+
+        if (passed == 0)
+            return Result<decimal>.Success(0);
+
+        var result = (decimal)(passed / totalDays) * policy.PremiumAmount;
+
+        return Result<decimal>.Success(result);
+    }
+    
 }

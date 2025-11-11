@@ -4,6 +4,7 @@ namespace Policy.Application.Dtos;
 
 public sealed class PolicyUpdateModel
 {
+    public string UserName { get; set; } = null!;
     public int PolicyId { get; set; }
     public PolicyStatus PolicyStatus { get; set; }
 

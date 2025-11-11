@@ -1,4 +1,5 @@
-﻿using Policy.Domain.Entities;
+﻿using Policy.Domain;
+using Policy.Domain.Entities;
 
 namespace Policy.Infrastructure.Data;
 
@@ -19,7 +20,7 @@ public class PolicyDbContext : DbContext
     public DbSet<UserPayment> UserPayments { get; set; }
 
     public DbSet<CompanyPayment> CompanyPayments { get; set; }
-
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

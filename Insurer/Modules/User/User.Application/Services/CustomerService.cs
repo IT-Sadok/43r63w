@@ -1,4 +1,7 @@
-﻿using FluentValidation;
+﻿using Auth.Application.Contracts;
+using Auth.Application.Dtos;
+using Auth.Domain.Enums;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Shared.Errors;
 using Shared.Results;
@@ -13,6 +16,7 @@ namespace User.Application.Services;
 
 internal sealed class CustomerService(
     UserDbContext userDbContext,
+    IAuthServicePublic authServicePublic,
     IValidator<CreateCustomerModel> validator)
 {
     public async Task<Result<bool>> CreateCustomerAsync(
@@ -45,7 +49,15 @@ internal sealed class CustomerService(
 
         userDbContext.Customers.Add(entity);
         await userDbContext.SaveChangesAsync(cancellationToken);
-
+        
+        var roleModel = new AssignRoleModel
+        {
+            UserId = entity.UserId,
+            Role = Role.Customer,
+        };
+        
+        await authServicePublic.AssignRoleAsync(roleModel, cancellationToken);
+        
         return Result<bool>.Success(true);
     }
 

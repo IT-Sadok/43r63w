@@ -1,8 +1,10 @@
-﻿using Shared.Errors;
+﻿using Auth.Application.Contracts;
+using Auth.Application.Dtos;
+using Auth.Domain.Enums;
+using Shared.Errors;
 using Shared.Results;
 using User.Application.Mapper;
 using User.Application.Models;
-using User.Domain;
 using User.Domain.Entity;
 using User.Domain.ValueObject;
 using User.Infrastructure.Data;
@@ -10,6 +12,7 @@ using User.Infrastructure.Data;
 namespace User.Application.Services;
 
 internal sealed class AgentService(
+    IAuthServicePublic authServicePublic,
     UserDbContext userDbContext)
 {
     public async Task<Result<bool>> CreateAgentAsync(
@@ -40,6 +43,14 @@ internal sealed class AgentService(
 
         userDbContext.Agents.Add(entity);
         await userDbContext.SaveChangesAsync(cancellationToken);
+
+        var roleModel = new AssignRoleModel
+        {
+            UserId = entity.UserId,
+            Role = Role.Agent
+        };
+
+        await authServicePublic.AssignRoleAsync(roleModel, cancellationToken);
 
         return Result<bool>.Success(true);
     }

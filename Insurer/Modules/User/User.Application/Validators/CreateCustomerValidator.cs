@@ -1,5 +1,6 @@
 ﻿using System.Net.Mime;
 using FluentValidation;
+using Shared.Errors;
 using User.Application.Models;
 
 namespace User.Application.Validators;
@@ -9,19 +10,23 @@ public class CreateCustomerValidator : AbstractValidator<CreateCustomerModel>
     public CreateCustomerValidator()
     {
         RuleFor(m => m.UserId)
-            .NotNull();
+            .NotNull()
+            .WithMessage(ErrorsMessage.RequiredFieldError);
 
         RuleFor(m => m.FirstName)
             .NotEmpty()
-            .NotNull();
+            .NotNull()
+            .WithMessage(ErrorsMessage.RequiredFieldError);
 
         RuleFor(m => m.LastName)
             .NotEmpty()
-            .NotNull();
+            .NotNull()
+            .WithMessage(ErrorsMessage.RequiredFieldError);;
 
         RuleFor(m => m.MiddleName)
             .NotEmpty()
-            .NotNull();
+            .NotNull()
+            .WithMessage(ErrorsMessage.RequiredFieldError);;
 
         RuleFor(e => e.Email)
             .EmailAddress();

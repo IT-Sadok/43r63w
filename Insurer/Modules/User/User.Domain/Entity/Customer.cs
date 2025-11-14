@@ -1,4 +1,5 @@
-﻿using User.Domain.ValueObject;
+﻿using Microsoft.AspNetCore.Identity;
+using User.Domain.ValueObject;
 
 namespace User.Domain.Entity;
 

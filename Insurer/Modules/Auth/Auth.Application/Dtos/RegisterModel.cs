@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Auth.Domain.Enums;
 
 namespace Auth.Application.Dtos;
 
@@ -15,6 +16,8 @@ public sealed class RegisterModel
 
     [Compare("Password", ErrorMessage = "Passwords do not match")]
     public string ConfirmPassword { get; set; } = null!;
+    
+    public Role? Role { get; set; }
 }
 
 

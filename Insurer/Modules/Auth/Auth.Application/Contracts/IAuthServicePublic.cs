@@ -12,4 +12,9 @@ public interface IAuthServicePublic
         LoginModel loginDto, CancellationToken cancellationToken);
 
     public Task<Result<UserModel>> GetMeAsync(CancellationToken cancellationToken);
+
+    public Task<Result<bool>> AssignRoleAsync(
+        AssignRoleModel model, 
+        CancellationToken cancellationToken);
+        
 }

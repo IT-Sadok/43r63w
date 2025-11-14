@@ -20,6 +20,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Modules\Auth\Auth.Bootstrapper\Auth.Bootstrapper.csproj" />
     <ProjectReference Include="..\Modules\Policy\Policy.Bootstrapper\Policy.Bootstrapper.csproj" />
+    <ProjectReference Include="..\Modules\User\User.Bootstrapper\User.Bootstrapper.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,6 +33,18 @@
     <_ContentIncludedByDefault Remove="Modules\Auth\Auth.Infrastructure\obj\Auth.Infrastructure.csproj.nuget.dgspec.json" />
     <_ContentIncludedByDefault Remove="Modules\Auth\Auth.Infrastructure\obj\project.assets.json" />
     <_ContentIncludedByDefault Remove="Modules\Auth\Auth.Infrastructure\obj\project.packagespec.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Modules\Users\User.Domain\Entity\Customer.cs">
+      <Link>Modules\Users\Users.Domain\Entity\Customer.cs</Link>
+    </Compile>
+    <Compile Update="Modules\Users\User.Domain\Entity\Agents.cs">
+      <Link>Modules\Users\Users.Domain\Entity\Agents.cs</Link>
+    </Compile>
+    <Compile Update="Modules\Users\User.Domain\ValueObject\Address.cs">
+      <Link>Modules\Users\Users.Domain\ValueObject\Address.cs</Link>
+    </Compile>
   </ItemGroup>
   
 </Project>

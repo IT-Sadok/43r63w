@@ -4,13 +4,19 @@
     <Project Path="..\Modules\Auth\Auth.Bootstrapper\Auth.Bootstrapper.csproj" />
     <Project Path="..\Modules\Auth\Auth.Application\Auth.Application.csproj" />
     <Project Path="..\Modules\Auth\Auth.Domain\Auth.Domain.csproj" />
-    <Project Path="..\Modules\Auth\Auth.Infrastructure\Auth.Infrastructure.csproj"/>
+    <Project Path="..\Modules\Auth\Auth.Infrastructure\Auth.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/Modules/Policy/">
     <Project Path="../Modules/Policy/Policy.Application/Policy.Application.csproj" />
     <Project Path="../Modules/Policy/Policy.Bootstrapper/Policy.Bootstrapper.csproj" />
     <Project Path="../Modules/Policy/Policy.Domain/Policy.Domain.csproj" />
     <Project Path="../Modules/Policy/Policy.Infrastructure/Policy.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/Modules/User/">
+    <Project Path="../Modules/User/User.Application/User.Application.csproj" />
+    <Project Path="../Modules/User/User.Bootstrapper/User.Bootstrapper.csproj" />
+    <Project Path="../Modules/User/User.Domain/User.Domain.csproj" />
+    <Project Path="../Modules/User/User.Infrastructure/User.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/Shared/">
     <Project Path="../Shared/Shared/Shared.csproj" />

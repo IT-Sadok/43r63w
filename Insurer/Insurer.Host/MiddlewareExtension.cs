@@ -8,5 +8,7 @@ public static class MiddlewareExtension
     {
         app.MapPolicyEndpoints();
         app.MapAuthEndpoints();
+        app.MapCustomerEndpoints();
+        app.MapAgentEndpoints();
     }
 }

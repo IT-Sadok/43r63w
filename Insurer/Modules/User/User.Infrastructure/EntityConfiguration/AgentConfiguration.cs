@@ -5,9 +5,9 @@ using User.Domain.Entity;
 
 namespace User.Infrastructure.EntityConfiguration;
 
-internal sealed class AgentConfiguration : IEntityTypeConfiguration<Customer>
+internal sealed class AgentConfiguration : IEntityTypeConfiguration<Agent>
 {
-    public void Configure(EntityTypeBuilder<Customer> builder)
+    public void Configure(EntityTypeBuilder<Agent> builder)
     {
         builder.OwnsOne(e => e.Address, a =>
         {

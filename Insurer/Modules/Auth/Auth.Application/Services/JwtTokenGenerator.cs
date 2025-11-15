@@ -11,14 +11,16 @@ public class JwtTokenGenerator(IOptions<JwtOptions> options) : IJwtTokenGenerato
 {
     private readonly JwtOptions _jwtOptions = options.Value;
 
-    public Result<string> GenerateToken(ApplicationUser user)
+    public Result<string> GenerateToken(
+        ApplicationUser user,
+        IEnumerable<string> roles)
     {
         var claims = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Name, user.UserName!),
-            new Claim(ClaimTypes.Role, "Admin"),
         };
+        claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.Key!));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

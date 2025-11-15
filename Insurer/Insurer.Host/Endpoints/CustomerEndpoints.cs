@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Auth.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Shared.ContextAccessor;
 using User.Application.Contracts;
 using User.Application.Models;
@@ -9,9 +11,13 @@ public static class UserEndpoints
 {
     public static void MapCustomerEndpoints(this IEndpointRouteBuilder app)
     {
-        app.MapGroup("customer").RequireAuthorization();
-        
-        app.MapPost("", CreateCustomerAsync);
+        app.MapGroup("customer")
+            .RequireAuthorization();
+
+
+        app.MapPost("", CreateCustomerAsync)
+            .RequireAuthorization(new AuthorizeAttribute { Roles = nameof(Role.Agent) });
+            
         app.MapGet("{id}", GetCustomerAsync);
         app.MapPut("{id}", UpdateCustomerAsync);
     }

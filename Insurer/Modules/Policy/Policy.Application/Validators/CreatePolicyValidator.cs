@@ -27,6 +27,9 @@ public class CreatePolicyValidator : AbstractValidator<CreatePolicyModel>
             .NotEqual(0)
             .WithMessage("Premium amount must be greater than 0");
 
+        RuleFor(x => x.CoverageAmount)
+            .GreaterThanOrEqualTo(0);
+
 
         RuleFor(e => e.UserPaymentsModel).ChildRules(cr =>
             cr.RuleFor(a => a.Amount).GreaterThanOrEqualTo(1).WithMessage("Amount must be greater than or equal to 1"));

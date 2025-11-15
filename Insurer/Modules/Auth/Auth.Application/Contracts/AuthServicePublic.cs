@@ -13,4 +13,9 @@ internal sealed class AuthServicePublic(IAuthService authService) : IAuthService
 
     public Task<Result<UserModel>> GetMeAsync(CancellationToken cancellationToken)
         => authService.GetMeAsync();
+
+    public Task<Result<bool>> AssignRoleAsync(
+        AssignRoleModel model, 
+        CancellationToken cancellationToken)
+        => authService.AssignRolesAsync(model, cancellationToken);
 }

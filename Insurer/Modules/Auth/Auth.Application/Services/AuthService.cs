@@ -28,15 +28,15 @@ internal sealed class AuthService(
 
     public async Task<Result<bool>> AssignRolesAsync(AssignRoleModel model, CancellationToken cancellationToken)
     {
-        var user = await userManager.FindByIdAsync(model.UserId.ToString());
+        var user = await userManager.FindByIdAsync(model.UserId);
         if (user == null)
             return Result<bool>.Failure("User not found");
 
         var roles = await userManager.GetRolesAsync(user);
-        if (roles.Contains(nameof(model.Role)))
+        if (roles.Contains(model.Role.ToString()))
             return Result<bool>.Failure("User is already assigned");
 
-        var result = await userManager.AddToRoleAsync(user, nameof(model.Role));
+        var result = await userManager.AddToRoleAsync(user, model.Role.ToString());
         return Result<bool>.Success(true);
     }
 

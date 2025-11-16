@@ -74,7 +74,7 @@ internal sealed class CustomerService(
 
         var roleModel = new AssignRoleModel
         {
-            UserId = entity.UserId,
+            UserId = entity.UserId.ToString(),
             Role = Role.Customer,
         };
 

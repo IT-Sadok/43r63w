@@ -46,7 +46,7 @@ internal sealed class AgentService(
 
         var roleModel = new AssignRoleModel
         {
-            UserId = entity.UserId,
+            UserId = entity.UserId.ToString(),
             Role = Role.Agent
         };
 

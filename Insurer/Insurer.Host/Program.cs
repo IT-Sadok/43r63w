@@ -15,6 +15,8 @@ builder.Services.AddSwagger();
 
 var app = builder.Build();
 
+app.SetupExceptionHandler();
+
 app.SetupSwagger();
 app.SetupEndpoints();
 

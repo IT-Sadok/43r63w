@@ -17,7 +17,7 @@ public static class AgentEndpoints
     }
 
     private static async Task<IResult> CreateAgentAsync(
-        CreateAgentModel model,
+        [FromBody] CreateAgentModel model,
         [FromServices] IAgentServicePublic agentServicePublic,
         CancellationToken cancellationToken)
     {
@@ -28,7 +28,7 @@ public static class AgentEndpoints
     }
 
     private static async Task<IResult> GetAgentAsync(
-        int id,
+        [FromRoute]int id,
         [FromServices] IAgentServicePublic agentServicePublic,
         CancellationToken cancellationToken)
     {

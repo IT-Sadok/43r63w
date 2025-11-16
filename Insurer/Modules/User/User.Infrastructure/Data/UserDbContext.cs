@@ -11,6 +11,8 @@ public class UserDbContext(DbContextOptions<UserDbContext> options)
     
     public DbSet<Agent> Agents { get; set; }
     
+    public DbSet<Invitation> Invitations { get; set; }
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

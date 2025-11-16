@@ -27,6 +27,26 @@ internal sealed class CustomerService(
         if (!validate.IsValid)
             return Result<bool>.Failure(ErrorsMessage.ValidationError);
 
+        var isCustomerExist = await userDbContext
+            .Customers
+            .AnyAsync(e => e.Email == model.Email
+                           || e.PhoneNumber == model.PhoneNumber, cancellationToken);
+
+        if (isCustomerExist)
+            return Result<bool>.Failure("Customer already exists");
+
+        await using var tx = await userDbContext.Database.BeginTransactionAsync(cancellationToken);
+
+        var invitation = new Invitation
+        {
+            Key = Guid.NewGuid(),
+            Identifier = model.Email ?? model.PhoneNumber,
+            ExpireTime = DateTime.Now.AddDays(7),
+            IsExpired = false
+        };
+
+        await userDbContext.Invitations.AddAsync(invitation, cancellationToken);
+
         var entity = new Customer
         {
             UserId = model.UserId,
@@ -49,16 +69,20 @@ internal sealed class CustomerService(
 
         userDbContext.Customers.Add(entity);
         await userDbContext.SaveChangesAsync(cancellationToken);
-        
+
+        await tx.CommitAsync(cancellationToken);
+
         var roleModel = new AssignRoleModel
         {
             UserId = entity.UserId,
             Role = Role.Customer,
         };
-        
-        await authServicePublic.AssignRoleAsync(roleModel, cancellationToken);
-        
-        return Result<bool>.Success(true);
+
+        var result = await authServicePublic.AssignRoleAsync(roleModel, cancellationToken);
+
+        return result.IsSuccess
+            ? Result<bool>.Success(true)
+            : Result<bool>.Failure("Something went wrong");
     }
 
     public async Task<Result<CustomerModel>> GetCustomerAsync(
@@ -79,14 +103,14 @@ internal sealed class CustomerService(
         var customer = await userDbContext.Customers.FindAsync(model.Id, cancellationToken);
         if (customer == null)
             return Result<bool>.Failure(ErrorsMessage.EntityError);
-        
-       if(!string.IsNullOrWhiteSpace(model.Email))
-           customer.Email = model.Email;
-       if (!string.IsNullOrWhiteSpace(model.PhoneNumber))
-           customer.PhoneNumber = model.PhoneNumber;
-       if(model.DateOfBirth.HasValue)
-           customer.DateOfBirth = model.DateOfBirth.Value;
-       
+
+        if (!string.IsNullOrWhiteSpace(model.Email))
+            customer.Email = model.Email;
+        if (!string.IsNullOrWhiteSpace(model.PhoneNumber))
+            customer.PhoneNumber = model.PhoneNumber;
+        if (model.DateOfBirth.HasValue)
+            customer.DateOfBirth = model.DateOfBirth.Value;
+
         var affected = await userDbContext.SaveChangesAsync(cancellationToken);
 
         return affected > 0

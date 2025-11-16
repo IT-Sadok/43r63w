@@ -23,7 +23,7 @@ public static class UserEndpoints
     }
 
     private static IResult UpdateCustomerAsync(
-        UpdateCustomerModel model,
+        [FromBody]UpdateCustomerModel model,
         [FromServices] ICustomerServicePublic customerService,
         CancellationToken cancellationToken = default)
     {
@@ -31,7 +31,7 @@ public static class UserEndpoints
     }
 
     public static async Task<IResult> CreateCustomerAsync(
-        CreateCustomerModel model,
+        [FromBody]CreateCustomerModel model,
         [FromServices] ICustomerServicePublic customerService,
         CancellationToken cancellationToken = default)
     {
@@ -42,7 +42,7 @@ public static class UserEndpoints
     }
 
     public static async Task<IResult> GetCustomerAsync(
-        int id,
+        [FromRoute]int id,
         [FromServices] ICustomerServicePublic customerService,
         CancellationToken cancellationToken = default)
     {

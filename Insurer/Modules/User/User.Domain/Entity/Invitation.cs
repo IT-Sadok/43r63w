@@ -1,5 +1,5 @@
 ﻿namespace User.Domain.Entity;
-public class Invintation
+public class Invitation
 {
     public int Id { get; set; }
 

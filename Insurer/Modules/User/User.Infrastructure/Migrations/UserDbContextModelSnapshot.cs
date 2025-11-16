@@ -121,7 +121,7 @@ namespace User.Infrastructure.Migrations
                     b.ToTable("Customers", "user");
                 });
 
-            modelBuilder.Entity("User.Domain.Entity.Invintation", b =>
+            modelBuilder.Entity("User.Domain.Entity.Invitation", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()

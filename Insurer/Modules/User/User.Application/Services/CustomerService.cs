@@ -37,7 +37,7 @@ internal sealed class CustomerService(
 
         await using var tx = await userDbContext.Database.BeginTransactionAsync(cancellationToken);
 
-        var invintation = new Invintation
+        var invitation = new Invitation
         {
             Key = Guid.NewGuid(),
             Identifier = model.Email ?? model.PhoneNumber,
@@ -45,7 +45,7 @@ internal sealed class CustomerService(
             IsExpired = false
         };
 
-        await userDbContext.Invitations.AddAsync(invintation, cancellationToken);
+        await userDbContext.Invitations.AddAsync(invitation, cancellationToken);
 
         var entity = new Customer
         {

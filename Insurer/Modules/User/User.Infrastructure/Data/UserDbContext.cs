@@ -11,7 +11,7 @@ public class UserDbContext(DbContextOptions<UserDbContext> options)
     
     public DbSet<Agent> Agents { get; set; }
     
-    public DbSet<Invintation> Invitations { get; set; }
+    public DbSet<Invitation> Invitations { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

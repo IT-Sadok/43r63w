@@ -10,7 +10,7 @@ public static class AgentEndpoints
 {
     public static void MapAgentEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/agent").RequireAuthorization();
+        var group = app.MapGroup("/agents").RequireAuthorization();
 
         group.MapPost("", CreateAgentAsync);
         group.MapGet("{id}", CreateAgentAsync);

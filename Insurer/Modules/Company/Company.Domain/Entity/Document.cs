@@ -7,14 +7,12 @@ public class Document
 
     public int CompanyId { get; set; }
 
-    public string FileStorageId { get; set; } = null!;
+    public string ObjectName { get; set; } = null!;
 
     public string? Name { get; set; }
 
     public FileType Type { get; set; }
-
-    public double Size { get; set; }
-
+    
     public DateTime CreatedAt { get; set; }
     
     public DateTime UpdatedAt { get; set; }

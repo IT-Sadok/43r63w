@@ -1,10 +1,7 @@
 ﻿using Auth.Domain.Domain;
-using Auth.Domain.Enums;
 using Auth.Infrastructure.Data;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
-
 namespace Auth.Infrastructure;
+
 
 public static class DependencyInjection
 {

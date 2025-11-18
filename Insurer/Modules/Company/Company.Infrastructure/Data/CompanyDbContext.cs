@@ -13,6 +13,4 @@ public class CompanyDbContext(DbContextOptions<CompanyDbContext> options) : DbCo
         base.OnModelCreating(modelBuilder);
         modelBuilder.HasDefaultSchema("company");
     }
-    
-    
 }

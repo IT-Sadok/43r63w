@@ -8,6 +8,7 @@ using Shared.Results;
 using User.Application.Contracts;
 using User.Application.Mapper;
 using User.Application.Models;
+using User.Application.Models.Responses;
 using User.Domain.Entity;
 using User.Domain.ValueObject;
 using User.Infrastructure.Data;
@@ -19,13 +20,13 @@ internal sealed class CustomerService(
     IAuthService authServicePublic,
     IValidator<CreateCustomerModel> validator) : ICustomerService
 {
-    public async Task<Result<bool>> CreateCustomerAsync(
+    public async Task<Result<CreateCustomerResponse>> CreateCustomerAsync(
         CreateCustomerModel model,
         CancellationToken cancellationToken = default)
     {
         var validate = await validator.ValidateAsync(model, cancellationToken);
         if (!validate.IsValid)
-            return Result<bool>.Failure(ErrorsMessage.ValidationError);
+            return Result<CreateCustomerResponse>.Failure(ErrorsMessage.ValidationError);
 
         var isCustomerExist = await userDbContext
             .Customers
@@ -33,7 +34,7 @@ internal sealed class CustomerService(
                            || e.PhoneNumber == model.PhoneNumber, cancellationToken);
 
         if (isCustomerExist)
-            return Result<bool>.Failure("Customer already exists");
+            return Result<CreateCustomerResponse>.Failure("Customer already exists");
 
         await using var tx = await userDbContext.Database.BeginTransactionAsync(cancellationToken);
 
@@ -81,8 +82,8 @@ internal sealed class CustomerService(
         var result = await authServicePublic.AssignRolesAsync(roleModel, cancellationToken);
 
         return result.IsSuccess
-            ? Result<bool>.Success(true)
-            : Result<bool>.Failure("Something went wrong");
+            ? Result<CreateCustomerResponse>.Success(new CreateCustomerResponse { Success = true })
+            : Result<CreateCustomerResponse>.Failure("Something went wrong");
     }
 
     public async Task<Result<CustomerModel>> GetCustomerAsync(
@@ -96,13 +97,13 @@ internal sealed class CustomerService(
             : Result<CustomerModel>.Success(entity.ToModel());
     }
 
-    public async Task<Result<bool>> UpdateCustomerAsync(
+    public async Task<Result<UpdateCustomerResponse>> UpdateCustomerAsync(
         UpdateCustomerModel model,
         CancellationToken cancellationToken = default)
     {
         var customer = await userDbContext.Customers.FindAsync(model.Id, cancellationToken);
         if (customer == null)
-            return Result<bool>.Failure(ErrorsMessage.EntityError);
+            return Result<UpdateCustomerResponse>.Failure(ErrorsMessage.EntityError);
 
         if (!string.IsNullOrWhiteSpace(model.Email))
             customer.Email = model.Email;
@@ -114,7 +115,7 @@ internal sealed class CustomerService(
         var affected = await userDbContext.SaveChangesAsync(cancellationToken);
 
         return affected > 0
-            ? Result<bool>.Success(true)
-            : Result<bool>.Failure("Cannot update customer.");
+            ? Result<UpdateCustomerResponse>.Success(new UpdateCustomerResponse { Success = true })
+            : Result<UpdateCustomerResponse>.Failure("Cannot update customer.");
     }
 }

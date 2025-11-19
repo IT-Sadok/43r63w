@@ -6,6 +6,7 @@ using Shared.Results;
 using User.Application.Contracts;
 using User.Application.Mapper;
 using User.Application.Models;
+using User.Application.Models.Responses;
 using User.Domain.Entity;
 using User.Domain.ValueObject;
 using User.Infrastructure.Data;
@@ -16,7 +17,7 @@ internal sealed class AgentService(
     IAuthService authServicePublic,
     UserDbContext userDbContext) : IAgentService
 {
-    public async Task<Result<bool>> CreateAgentAsync(
+    public async Task<Result<CreateAgentResponse>> CreateAgentAsync(
         CreateAgentModel model,
         CancellationToken cancellationToken = default)
     {
@@ -53,7 +54,7 @@ internal sealed class AgentService(
 
         await authServicePublic.AssignRolesAsync(roleModel, cancellationToken);
 
-        return Result<bool>.Success(true);
+        return Result<CreateAgentResponse>.Success(new CreateAgentResponse { Success = true });
     }
 
     public async Task<Result<GetAgentModel>> GetAgentAsync(

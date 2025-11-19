@@ -1,6 +1,5 @@
 using Auth.Bootstrapper;
 using Company.Bootstrapper;
-using Insurer.Host;
 using Insurer.Host.Configuration;
 using Policy.Bootstrapper;
 using User.Bootstrapper;

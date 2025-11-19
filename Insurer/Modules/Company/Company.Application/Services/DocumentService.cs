@@ -1,4 +1,5 @@
 ﻿using Company.Application.Models;
+using Company.Application.Models.Responses;
 using Company.Infrastructure.Data;
 using Company.Infrastructure.FileStorage;
 using Company.Infrastructure.FileStorage.Models;
@@ -14,12 +15,12 @@ internal sealed class DocumentService(
     IFileStorageRepository fileStorageRepository,
     IValidator<CreateDocumentModel> validator)
 {
-    public async Task<Result<bool>> CreateDocumentAsync(CreateDocumentModel model,
+    public async Task<Result<CreateDocumentResponse>> CreateDocumentAsync(CreateDocumentModel model,
         CancellationToken cancellationToken = default)
     {
         var validate = await validator.ValidateAsync(model, cancellationToken);
         if (!validate.IsValid)
-            return Result<bool>.Failure(ErrorsMessage.ValidationError,
+            return Result<CreateDocumentResponse>.Failure(ErrorsMessage.ValidationError,
                 validate.Errors.ToDictionary(key => key.PropertyName, val => val.ErrorMessage));
 
         var company = await companyDbContext.Companies
@@ -27,7 +28,7 @@ internal sealed class DocumentService(
             .FirstOrDefaultAsync(e => e.Id == model.CompanyId, cancellationToken);
 
         if (company == null)
-            return Result<bool>.Failure(ErrorsMessage.EntityError);
+            return Result<CreateDocumentResponse>.Failure(ErrorsMessage.EntityError);
 
         var createFileModel = new CreateFileModel
         {
@@ -38,7 +39,7 @@ internal sealed class DocumentService(
 
         var fileResponse = await fileStorageRepository.CreateFileAsync(createFileModel, cancellationToken);
         if (!fileResponse.IsSuccess)
-            return Result<bool>.Failure(ErrorsMessage.ErrorWhileUploadFile);
+            return Result<CreateDocumentResponse>.Failure(ErrorsMessage.ErrorWhileUploadFile);
 
         var entity = new Domain.Entity.Document
         {
@@ -53,6 +54,9 @@ internal sealed class DocumentService(
         companyDbContext.Documents.Add(entity);
         await companyDbContext.SaveChangesAsync(cancellationToken);
 
-        return Result<bool>.Success(true);
+        return Result<CreateDocumentResponse>.Success(new CreateDocumentResponse
+        {
+            Success = true,
+        });
     }
 }

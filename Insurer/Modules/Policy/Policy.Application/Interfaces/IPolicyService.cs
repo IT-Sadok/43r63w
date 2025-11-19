@@ -1,4 +1,5 @@
 ﻿using Policy.Application.Dtos;
+using Policy.Application.Dtos.Responses;
 using Policy.Application.FilterExstension;
 using Shared.Pagination;
 using Shared.Results;
@@ -17,13 +18,13 @@ public interface IPolicyService
         GetPolicyModel model,
         CancellationToken cancellationToken = default);
 
-    Task<Result<bool>> CreatePolicyAsync(
+    Task<Result<CreatePolicyResponse>> CreatePolicyAsync(
         CreatePolicyModel model,
         CancellationToken cancellationToken = default);
 
-    Task<Result<bool>> UpdatePolicyAsync(
+    Task<Result<UpdatePolicyResponse>> UpdatePolicyAsync(
         PolicyUpdateModel model,
         CancellationToken cancellationToken = default);
 
-    Task<Result<bool>> DeletePolicyAsync(int policyId, CancellationToken cancellationToken);
+    Task<Result<DeletePolicyResponse>> DeletePolicyAsync(int policyId, CancellationToken cancellationToken);
 }

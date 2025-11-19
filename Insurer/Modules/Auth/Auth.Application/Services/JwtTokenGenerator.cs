@@ -11,7 +11,7 @@ public class JwtTokenGenerator(IOptions<JwtOptions> options) : IJwtTokenGenerato
 {
     private readonly JwtOptions _jwtOptions = options.Value;
 
-    public Result<string> GenerateToken(
+    public Result<GenerateTokenResponse> GenerateToken(
         ApplicationUser user,
         IEnumerable<string> roles)
     {
@@ -35,6 +35,6 @@ public class JwtTokenGenerator(IOptions<JwtOptions> options) : IJwtTokenGenerato
 
         var token = new JwtSecurityTokenHandler().WriteToken(securityToken);
 
-        return Result<string>.Success(token);
+        return Result<GenerateTokenResponse>.Success(new GenerateTokenResponse { Token = token });
     }
 }

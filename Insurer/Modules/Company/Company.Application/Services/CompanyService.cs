@@ -1,11 +1,12 @@
 ﻿using Company.Application.Models;
+using Company.Application.Models.Responses;
 using Company.Infrastructure.Data;
 using Shared.Results;
 
 namespace Company.Application.Services;
 internal sealed class CompanyService(CompanyDbContext companyDbContext)
 {
-    public async Task<Result<bool>> CreateCompanyAsync(
+    public async Task<Result<CreateCompanyResponse>> CreateCompanyAsync(
         CreateCompanyModel model,
         CancellationToken cancellationToken = default)
     {
@@ -22,6 +23,9 @@ internal sealed class CompanyService(CompanyDbContext companyDbContext)
         companyDbContext.Companies.Add(company);
         await companyDbContext.SaveChangesAsync(cancellationToken);
         
-        return Result<bool>.Success(true);
+        return Result<CreateCompanyResponse>.Success(new CreateCompanyResponse
+        {
+            Success = true,
+        });
     }
 }

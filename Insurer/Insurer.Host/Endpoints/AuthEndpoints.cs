@@ -1,5 +1,5 @@
-﻿using Auth.Application.Contracts;
-using Auth.Application.Dtos;
+﻿using Auth.Application.Dtos;
+using Auth.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Shared.ContextAccessor;
 
@@ -21,7 +21,7 @@ public static class AuthEndpoints
     }
 
     private static async Task<IResult> RegisterAsync(
-        [FromServices] IAuthServicePublic authService,
+        [FromServices] IAuthService authService,
         RegisterModel request,
         CancellationToken cancellationToken)
     {
@@ -32,7 +32,7 @@ public static class AuthEndpoints
     }
 
     private static async Task<IResult> LoginAsync(
-        [FromServices] IAuthServicePublic authService,
+        [FromServices] IAuthService authService,
         LoginModel request,
         CancellationToken cancellationToken)
     {
@@ -43,7 +43,7 @@ public static class AuthEndpoints
     }
 
     private static async Task<IResult> MeAsync(
-        [FromServices] IAuthServicePublic authService,
+        [FromServices] IAuthService authService,
         CancellationToken cancellationToken)
     {
         var result = await authService.GetMeAsync(cancellationToken);
@@ -53,7 +53,7 @@ public static class AuthEndpoints
     }
 
     private static async Task<IResult> AssignRoleAsync(
-        [FromServices] IAuthServicePublic authService,
+        [FromServices] IAuthService authService,
         [FromServices] IUserContextAccessor userContextAccessor,
         AssignRoleModel model,
         CancellationToken cancellationToken)
@@ -61,7 +61,7 @@ public static class AuthEndpoints
         var user = userContextAccessor.GetUserContext();
         model.UserId = user.UserId!;
         
-        var result = await authService.AssignRoleAsync(model, cancellationToken);
+        var result = await authService.AssignRolesAsync(model, cancellationToken);
         return result.IsSuccess
             ? Results.Ok("Succeeded")
             : Results.BadRequest(result.Errors);

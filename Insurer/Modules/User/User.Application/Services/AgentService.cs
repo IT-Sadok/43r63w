@@ -1,8 +1,9 @@
-﻿using Auth.Application.Contracts;
-using Auth.Application.Dtos;
+﻿using Auth.Application.Dtos;
+using Auth.Application.Interfaces;
 using Auth.Domain.Enums;
 using Shared.Errors;
 using Shared.Results;
+using User.Application.Contracts;
 using User.Application.Mapper;
 using User.Application.Models;
 using User.Domain.Entity;
@@ -12,8 +13,8 @@ using User.Infrastructure.Data;
 namespace User.Application.Services;
 
 internal sealed class AgentService(
-    IAuthServicePublic authServicePublic,
-    UserDbContext userDbContext)
+    IAuthService authServicePublic,
+    UserDbContext userDbContext) : IAgentService
 {
     public async Task<Result<bool>> CreateAgentAsync(
         CreateAgentModel model,
@@ -50,7 +51,7 @@ internal sealed class AgentService(
             Role = Role.Agent
         };
 
-        await authServicePublic.AssignRoleAsync(roleModel, cancellationToken);
+        await authServicePublic.AssignRolesAsync(roleModel, cancellationToken);
 
         return Result<bool>.Success(true);
     }

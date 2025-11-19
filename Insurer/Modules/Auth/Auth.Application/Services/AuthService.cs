@@ -58,7 +58,7 @@ internal sealed class AuthService(
             : Result<string>.Failure("Something went wrong");
     }
 
-    public async Task<Result<UserModel>> GetMeAsync()
+    public async Task<Result<UserModel>> GetMeAsync(CancellationToken cancellationToken)
     {
         var userId = userContextAccessor.GetUserContext();
 

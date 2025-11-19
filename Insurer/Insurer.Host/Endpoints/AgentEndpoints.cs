@@ -18,10 +18,10 @@ public static class AgentEndpoints
 
     private static async Task<IResult> CreateAgentAsync(
         [FromBody] CreateAgentModel model,
-        [FromServices] IAgentServicePublic agentServicePublic,
+        [FromServices] IAgentService agentService,
         CancellationToken cancellationToken)
     {
-        var result = await agentServicePublic.CreateAgentAsync(model, cancellationToken);
+        var result = await agentService.CreateAgentAsync(model, cancellationToken);
         return result.IsSuccess
             ? Results.NoContent()
             : Results.BadRequest();
@@ -29,10 +29,10 @@ public static class AgentEndpoints
 
     private static async Task<IResult> GetAgentAsync(
         [FromRoute]int id,
-        [FromServices] IAgentServicePublic agentServicePublic,
+        [FromServices] IAgentService agentService,
         CancellationToken cancellationToken)
     {
-        var result = await agentServicePublic.GetAgentAsync(id, cancellationToken);
+        var result = await agentService.GetAgentAsync(id, cancellationToken);
         return result.IsSuccess
             ? Results.Ok(result.Value)
             : Results.BadRequest(result.ErrorMessage);

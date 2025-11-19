@@ -23,7 +23,7 @@ public static class CustomerEndpoints
 
     private static IResult UpdateCustomerAsync(
         [FromBody]UpdateCustomerModel model,
-        [FromServices] ICustomerServicePublic customerService,
+        [FromServices] ICustomerService customerService,
         CancellationToken cancellationToken = default)
     {
         return Results.Ok();
@@ -31,7 +31,7 @@ public static class CustomerEndpoints
 
     private static async Task<IResult> CreateCustomerAsync(
         [FromBody]CreateCustomerModel model,
-        [FromServices] ICustomerServicePublic customerService,
+        [FromServices] ICustomerService customerService,
         CancellationToken cancellationToken = default)
     {
         var result = await customerService.CreateCustomerAsync(model, cancellationToken);
@@ -42,7 +42,7 @@ public static class CustomerEndpoints
 
     private static async Task<IResult> GetCustomerAsync(
         [FromRoute]int id,
-        [FromServices] ICustomerServicePublic customerService,
+        [FromServices] ICustomerService customerService,
         CancellationToken cancellationToken = default)
     {
         var result = await customerService.GetCustomerAsync(id, cancellationToken);

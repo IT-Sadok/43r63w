@@ -10,11 +10,11 @@ public static class DependencyInjection
     public static IServiceCollection AddUserApplication(this IServiceCollection services)
     {
         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
-        services.AddScoped<CustomerService>();
-        services.AddScoped<AgentService>();
+        services.AddScoped<Services.CustomerService>();
+        services.AddScoped<Services.AgentService>();
 
-        services.AddScoped<ICustomerServicePublic, CustomerServicePublic>();
-        services.AddScoped<IAgentServicePublic, AgentServicePublic>();
+        services.AddScoped<ICustomerService, CustomerService>();
+        services.AddScoped<IAgentService, AgentService>();
         return services;
     }
 }

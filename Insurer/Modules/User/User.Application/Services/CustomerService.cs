@@ -1,13 +1,13 @@
-﻿using Auth.Application.Contracts;
-using Auth.Application.Dtos;
+﻿using Auth.Application.Dtos;
+using Auth.Application.Interfaces;
 using Auth.Domain.Enums;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Shared.Errors;
 using Shared.Results;
+using User.Application.Contracts;
 using User.Application.Mapper;
 using User.Application.Models;
-using User.Domain;
 using User.Domain.Entity;
 using User.Domain.ValueObject;
 using User.Infrastructure.Data;
@@ -16,8 +16,8 @@ namespace User.Application.Services;
 
 internal sealed class CustomerService(
     UserDbContext userDbContext,
-    IAuthServicePublic authServicePublic,
-    IValidator<CreateCustomerModel> validator)
+    IAuthService authServicePublic,
+    IValidator<CreateCustomerModel> validator) : ICustomerService
 {
     public async Task<Result<bool>> CreateCustomerAsync(
         CreateCustomerModel model,
@@ -78,7 +78,7 @@ internal sealed class CustomerService(
             Role = Role.Customer,
         };
 
-        var result = await authServicePublic.AssignRoleAsync(roleModel, cancellationToken);
+        var result = await authServicePublic.AssignRolesAsync(roleModel, cancellationToken);
 
         return result.IsSuccess
             ? Result<bool>.Success(true)

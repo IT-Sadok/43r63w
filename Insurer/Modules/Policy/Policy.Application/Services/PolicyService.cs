@@ -11,13 +11,12 @@ using Shared.Errors;
 using Shared.Pagination;
 using Shared.Results;
 using Shared.Sorted;
-
 namespace Policy.Application.Services;
 
 internal sealed class PolicyService(
     IValidator<CreatePolicyModel> createPolicyModelValidator,
     IValidator<PolicyUpdateModel> updatePolicyModelValidator,
-    PolicyDbContext policyDbContext)
+    PolicyDbContext policyDbContext) : IPolicyService
 {
     public async Task<Result<PaginationResponse<PolicyModel>>> GetPoliciesAsync(
         PolicyFilter request,

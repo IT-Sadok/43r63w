@@ -7,32 +7,31 @@ using User.Application.Models;
 
 namespace Insurer.Host.Endpoints;
 
-public static class UserEndpoints
+public static class CustomerEndpoints
 {
     public static void MapCustomerEndpoints(this IEndpointRouteBuilder app)
     {
-        app.MapGroup("customer")
+        app.MapGroup("/customers")
             .RequireAuthorization();
-
-
+        
         app.MapPost("", CreateCustomerAsync)
             .RequireAuthorization(new AuthorizeAttribute { Roles = nameof(Role.Agent) });
             
-        app.MapGet("{id}", GetCustomerAsync);
-        app.MapPut("{id}", UpdateCustomerAsync);
+        app.MapGet("/{id}", GetCustomerAsync);
+        app.MapPut("/{id}", UpdateCustomerAsync);
     }
 
     private static IResult UpdateCustomerAsync(
         [FromBody]UpdateCustomerModel model,
-        [FromServices] ICustomerServicePublic customerService,
+        [FromServices] ICustomerService customerService,
         CancellationToken cancellationToken = default)
     {
         return Results.Ok();
     }
 
-    public static async Task<IResult> CreateCustomerAsync(
+    private static async Task<IResult> CreateCustomerAsync(
         [FromBody]CreateCustomerModel model,
-        [FromServices] ICustomerServicePublic customerService,
+        [FromServices] ICustomerService customerService,
         CancellationToken cancellationToken = default)
     {
         var result = await customerService.CreateCustomerAsync(model, cancellationToken);
@@ -41,9 +40,9 @@ public static class UserEndpoints
             : Results.BadRequest(result.Errors);
     }
 
-    public static async Task<IResult> GetCustomerAsync(
+    private static async Task<IResult> GetCustomerAsync(
         [FromRoute]int id,
-        [FromServices] ICustomerServicePublic customerService,
+        [FromServices] ICustomerService customerService,
         CancellationToken cancellationToken = default)
     {
         var result = await customerService.GetCustomerAsync(id, cancellationToken);

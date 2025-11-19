@@ -17,4 +17,9 @@ public static class MiddlewareExtension
         app.UseSwagger();
         app.UseSwaggerUI();
     }
+
+    public static void SetupExceptionHandler(this IApplicationBuilder app)
+    {
+        app.UseExceptionHandler();
+    }
 }

@@ -1,8 +1,8 @@
 ﻿using Auth.Domain.Domain;
 using Auth.Infrastructure.Data;
-using Microsoft.AspNetCore.Identity;
-
 namespace Auth.Infrastructure;
+
+
 public static class DependencyInjection
 {
     public static IServiceCollection AddAuthInfrastructure(

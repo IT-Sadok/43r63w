@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Policy.Application.Dtos;
+using Policy.Application.Dtos.Responses;
 using Policy.Application.FilterExstension;
 using Policy.Application.Mapping;
 using Policy.Application.Placeholders;
@@ -17,7 +18,7 @@ namespace Policy.Application.Services;
 internal sealed class PolicyService(
     IValidator<CreatePolicyModel> createPolicyModelValidator,
     IValidator<PolicyUpdateModel> updatePolicyModelValidator,
-    PolicyDbContext policyDbContext)
+    PolicyDbContext policyDbContext) : IPolicyService
 {
     public async Task<Result<PaginationResponse<PolicyModel>>> GetPoliciesAsync(
         PolicyFilter request,
@@ -62,13 +63,13 @@ internal sealed class PolicyService(
         return Result<PolicyModel>.Success(policyModel!);
     }
 
-    public async Task<Result<bool>> CreatePolicyAsync(
+    public async Task<Result<CreatePolicyResponse>> CreatePolicyAsync(
         CreatePolicyModel model,
         CancellationToken cancellationToken = default)
     {
         var validate = await createPolicyModelValidator.ValidateAsync(model, cancellationToken);
         if (!validate.IsValid)
-            return Result<bool>.Failure(
+            return Result<CreatePolicyResponse>.Failure(
                 errorMessage: ErrorsMessage.ValidationError,
                 errors: validate.Errors.ToDictionary(k => k.PropertyName, v => v.ErrorMessage));
 
@@ -94,7 +95,7 @@ internal sealed class PolicyService(
                     Notes = model.UserPaymentsModel.Notes,
                 }
             ],
-            PolicyHistories = 
+            PolicyHistories =
             [
                 new PolicyHistory
                 {
@@ -110,16 +111,19 @@ internal sealed class PolicyService(
         policyDbContext.Add(policy);
         await policyDbContext.SaveChangesAsync(cancellationToken);
 
-        return Result<bool>.Success(true);
+        return Result<CreatePolicyResponse>.Success(new CreatePolicyResponse
+        {
+            Success = true
+        });
     }
 
-    public async Task<Result<bool>> UpdatePolicyAsync(
+    public async Task<Result<UpdatePolicyResponse>> UpdatePolicyAsync(
         PolicyUpdateModel model,
         CancellationToken cancellationToken = default)
     {
         var validate = await updatePolicyModelValidator.ValidateAsync(model, cancellationToken);
         if (!validate.IsValid)
-            return Result<bool>.Failure(
+            return Result<UpdatePolicyResponse>.Failure(
                 errorMessage: ErrorsMessage.ValidationError,
                 errors: validate.Errors.ToDictionary(k => k.PropertyName, v => v.ErrorMessage));
 
@@ -144,19 +148,25 @@ internal sealed class PolicyService(
                 .SetProperty(p => p.Status, _ => model.PolicyStatus), cancellationToken);
 
         return affected == 0
-            ? Result<bool>.Failure("Something went wrong,try again")
-            : Result<bool>.Success(true);
+            ? Result<UpdatePolicyResponse>.Failure("Something went wrong,try again")
+            : Result<UpdatePolicyResponse>.Success(new UpdatePolicyResponse
+            {
+                Success = true
+            });
     }
 
-    public async Task<Result<bool>> DeletePolicyAsync(int policyId, CancellationToken cancellationToken)
+    public async Task<Result<DeletePolicyResponse>> DeletePolicyAsync(int policyId, CancellationToken cancellationToken)
     {
         var result = await policyDbContext.Policies
             .Where(e => e.Id == policyId)
             .ExecuteDeleteAsync(cancellationToken);
 
         return result > 0
-            ? Result<bool>.Success(true)
-            : Result<bool>.Success(false);
+            ? Result<DeletePolicyResponse>.Success(new DeletePolicyResponse
+            {
+                Success = true
+            })
+            : Result<DeletePolicyResponse>.Failure("Something went wrong,try again");
     }
 
 
@@ -181,5 +191,4 @@ internal sealed class PolicyService(
 
         return Result<decimal>.Success(result);
     }
-    
 }

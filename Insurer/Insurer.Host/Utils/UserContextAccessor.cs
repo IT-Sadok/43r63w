@@ -3,7 +3,7 @@ using Shared.ContextAccessor;
 
 namespace Insurer.Host.Utils;
 
-public class UserContextAccessor(IHttpContextAccessor httpContextAccessor) : IUserContextAccessor
+public sealed class UserContextAccessor(IHttpContextAccessor httpContextAccessor) : IUserContextAccessor
 {
     public UserContextModel GetUserContext()
     {

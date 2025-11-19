@@ -2,6 +2,6 @@
 
 public enum Role
 {
-    Customer,
-    Agent
+    Agent = 1,
+    Customer = 2
 }

@@ -1,4 +1,5 @@
 ﻿using Auth.Application.Dtos;
+using Auth.Application.Models.Responses;
 using Auth.Domain.Domain;
 using Shared.ContextAccessor;
 using Shared.Results;
@@ -10,7 +11,8 @@ internal sealed class AuthService(
     IJwtTokenGenerator jwtTokenGenerator,
     IUserContextAccessor userContextAccessor) : IAuthService
 {
-    public async Task<Result<bool>> RegisterAsync(RegisterModel registerDto, CancellationToken cancellationToken)
+    public async Task<Result<RegisterResponse>> RegisterAsync(RegisterModel registerDto,
+        CancellationToken cancellationToken)
     {
         var user = registerDto.ToEntity();
         var result = await userManager.CreateAsync(user, registerDto.Password);
@@ -21,44 +23,51 @@ internal sealed class AuthService(
         }
 
         return !result.Succeeded
-            ? Result<bool>.Failure("Something went wrong",
+            ? Result<RegisterResponse>.Failure("Something went wrong",
                 errors: result.Errors.ToDictionary(k => k.Code, v => v.Description))
-            : Result<bool>.Success(result.Succeeded);
+            : Result<RegisterResponse>.Success(new RegisterResponse
+            {
+                Success = result.Succeeded,
+            });
     }
 
-    public async Task<Result<bool>> AssignRolesAsync(AssignRoleModel model, CancellationToken cancellationToken)
+    public async Task<Result<AssignRoleResponse>> AssignRolesAsync(AssignRoleModel model,
+        CancellationToken cancellationToken)
     {
-        var user = await userManager.FindByIdAsync(model.UserId.ToString());
+        var user = await userManager.FindByIdAsync(model.UserId);
         if (user == null)
-            return Result<bool>.Failure("User not found");
+            return Result<AssignRoleResponse>.Failure("User not found");
 
         var roles = await userManager.GetRolesAsync(user);
-        if (roles.Contains(nameof(model.Role)))
-            return Result<bool>.Failure("User is already assigned");
+        if (roles.Contains(model.Role.ToString()))
+            return Result<AssignRoleResponse>.Failure("User is already assigned");
 
-        var result = await userManager.AddToRoleAsync(user, nameof(model.Role));
-        return Result<bool>.Success(true);
+        var result = await userManager.AddToRoleAsync(user, model.Role.ToString());
+        return Result<AssignRoleResponse>.Success(new AssignRoleResponse
+        {
+            Success = result.Succeeded,
+        });
     }
 
-    public async Task<Result<string>> LoginAsync(LoginModel loginDto, CancellationToken cancellationToken)
+    public async Task<Result<LoginResponse>> LoginAsync(LoginModel loginDto, CancellationToken cancellationToken)
     {
         var user = await userManager.FindByNameAsync(loginDto.UserName);
         if (user is null)
-            return Result<string>.Failure($"User not found");
+            return Result<LoginResponse>.Failure($"User not found");
 
         var result = await userManager.CheckPasswordAsync(user, loginDto.Password);
 
         if (!result)
-            return Result<string>.Failure($"Password did not match");
+            return Result<LoginResponse>.Failure($"Password did not match");
 
         var roles = await userManager.GetRolesAsync(user);
         var token = jwtTokenGenerator.GenerateToken(user, roles);
         return token.IsSuccess
-            ? Result<string>.Success(token.Value!)
-            : Result<string>.Failure("Something went wrong");
+            ? Result<LoginResponse>.Success(new LoginResponse { Token = token.Value!.Token })
+            : Result<LoginResponse>.Failure("Something went wrong");
     }
 
-    public async Task<Result<UserModel>> GetMeAsync()
+    public async Task<Result<UserModel>> GetMeAsync(CancellationToken cancellationToken)
     {
         var userId = userContextAccessor.GetUserContext();
 

@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using Auth.Application.Contracts;
 using Auth.Application.Options;
 using Auth.Application.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -39,7 +38,6 @@ public static class DependencyInjection
 
         services.AddAuthorization();
         services.AddScoped<IAuthService, AuthService>();
-        services.AddScoped<IAuthServicePublic, AuthServicePublic>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
         
         services.AddOptions<JwtOptions>()

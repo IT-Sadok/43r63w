@@ -9,6 +9,8 @@ public static class DependencyInjection
     public static IServiceCollection AddHostService(
         this IServiceCollection services)
     {
+        services.AddExceptionHandler<GlobalExceptionHandler>();
+        services.AddProblemDetails();
         services.AddScoped<IUserContextAccessor, UserContextAccessor>();
         services.AddHttpContextAccessor();
         return services;

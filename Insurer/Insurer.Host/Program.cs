@@ -16,6 +16,8 @@ builder.Services.AddSwagger();
 
 var app = builder.Build();
 
+
+app.UseAntiforgery();
 app.SetupExceptionHandler();
 
 app.SetupSwagger();

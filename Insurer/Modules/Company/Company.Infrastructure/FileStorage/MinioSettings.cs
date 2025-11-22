@@ -14,5 +14,5 @@ public class MinioSettings
 
     public bool UseSsl { get; set; }
 
-    public int FileSize { get; set; }
+    public double MaxFileSize { get; set; }
 }

@@ -1,24 +1,20 @@
 ﻿using Company.Infrastructure.FileStorage.Models;
+using Minio.DataModel.Response;
 using Shared.Results;
 
 namespace Company.Infrastructure.FileStorage;
 
 public interface IFileStorageRepository
 {
-    Task<Result<CreateFileResponseModel>> CreateFileAsync(
-        CreateFileModel model,
+    Task<PutObjectResponse?> CreateFileAsync(
+        MinioUploadModel model,
         CancellationToken cancellationToken = default);
 
-    Task GetFileAsync(
-        GetFileModel model,
+    Task<string?> GetFileUrlAsync(
+        string objectKey,
         CancellationToken cancellationToken = default);
 
-    Task<Result<bool>> DeleteFileAsync(
-        string fileName,
+    Task DeleteFileAsync(
+        string objectKey,
         CancellationToken cancellationToken = default);
-}
-
-public sealed class GetFileModel
-{
-    public string ObjectKey { get; set; } = null!;
 }

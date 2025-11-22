@@ -1,6 +1,6 @@
-﻿namespace Company.Application.Models;
+﻿namespace Company.Application.Models.Request;
 
-public sealed class CreateCompanyModel
+public sealed class CreateCompanyRequest
 {
     public string CompanyName { get; set; } = null!;
     

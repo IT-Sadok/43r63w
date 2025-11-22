@@ -1,60 +1,87 @@
-﻿using Company.Application.Models;
+﻿using System.Net;
+using Company.Application.Models.Request;
 using Company.Application.Models.Responses;
 using Company.Infrastructure.Data;
 using Company.Infrastructure.FileStorage;
 using Company.Infrastructure.FileStorage.Models;
-using FluentValidation;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 using Shared.Errors;
 using Shared.Results;
 
 namespace Company.Application.Services;
 
-internal sealed class DocumentService(
+public sealed class DocumentService(
     CompanyDbContext companyDbContext,
     IFileStorageRepository fileStorageRepository,
-    IValidator<CreateDocumentModel> validator)
+    IOptions<MinioSettings> options)
 {
-    public async Task<Result<CreateDocumentResponse>> CreateDocumentAsync(CreateDocumentModel model,
+    private readonly MinioSettings _minioSettings = options.Value;
+
+    public async Task<Result<CreateDocumentResponse>> CreateDocumentAsync(
+        IFormFile file,
+        string userId,
         CancellationToken cancellationToken = default)
     {
-        var validate = await validator.ValidateAsync(model, cancellationToken);
-        if (!validate.IsValid)
-            return Result<CreateDocumentResponse>.Failure(ErrorsMessage.ValidationError,
-                validate.Errors.ToDictionary(key => key.PropertyName, val => val.ErrorMessage));
+        using var ms = new MemoryStream();
+        await file.CopyToAsync(ms, cancellationToken);
 
-        var company = await companyDbContext.Companies
-            .Select(e => new { e.Id, e.CompanyName })
-            .FirstOrDefaultAsync(e => e.Id == model.CompanyId, cancellationToken);
+        var fileSize = Math.Round(file.Length / (1024.0 * 1024.0), 2);
 
-        if (company == null)
-            return Result<CreateDocumentResponse>.Failure(ErrorsMessage.EntityError);
+        if (fileSize > _minioSettings.MaxFileSize)
+            return Result<CreateDocumentResponse>.Failure("Max file [20MB] size exceeded");
 
-        var createFileModel = new CreateFileModel
+        var fileMinioModel = new MinioUploadModel
         {
-            ObjectKey = $"/documents/{Guid.NewGuid()}/{model.Name}",
-            CompanyName = company?.CompanyName ?? null,
-            Type = model.Type.ToString(),
+            ObjectKey = $"/documents/{Guid.NewGuid()}/{file.FileName}",
+            Content = ms.ToArray(),
+            Type = file.ContentType,
         };
 
-        var fileResponse = await fileStorageRepository.CreateFileAsync(createFileModel, cancellationToken);
-        if (!fileResponse.IsSuccess)
+        var fileResponse = await fileStorageRepository.CreateFileAsync(fileMinioModel, cancellationToken);
+        if (fileResponse != null || fileResponse?.ResponseStatusCode != HttpStatusCode.OK)
             return Result<CreateDocumentResponse>.Failure(ErrorsMessage.ErrorWhileUploadFile);
 
         var entity = new Domain.Entity.Document
         {
-            CompanyId = model.CompanyId,
-            Name = model.Name,
-            Type = model.Type,
+            CompanyId = 1,
+            UserId = Convert.ToInt32(userId),
+            Name = file.FileName,
+            Type = file.ContentType,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
-            ObjectName = fileResponse.Value!.ObjectName,
+            ObjectName = fileResponse.ObjectName,
         };
 
         companyDbContext.Documents.Add(entity);
         await companyDbContext.SaveChangesAsync(cancellationToken);
 
         return Result<CreateDocumentResponse>.Success(new CreateDocumentResponse
+        {
+            Success = true,
+        });
+    }
+
+    public async Task<Result<GetFileResponse>> GetFileUrlAsync(
+        string id,
+        CancellationToken cancellationToken = default)
+    {
+        var fileUrl = await fileStorageRepository.GetFileUrlAsync(id, cancellationToken);
+        if (string.IsNullOrEmpty(fileUrl))
+            return Result<GetFileResponse>.Failure("Fail not found");
+
+        return Result<GetFileResponse>.Success(new GetFileResponse
+        {
+            FileUrl = fileUrl
+        });
+    }
+
+    public async Task<Result<DeleteFileResponse>> DeleteFileAsync(
+        DeleteFileRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        await fileStorageRepository.DeleteFileAsync(request.ObjectKey, cancellationToken);
+        return Result<DeleteFileResponse>.Success(new DeleteFileResponse
         {
             Success = true,
         });

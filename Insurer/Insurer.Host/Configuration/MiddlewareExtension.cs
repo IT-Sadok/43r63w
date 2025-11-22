@@ -10,6 +10,7 @@ public static class MiddlewareExtension
         app.MapAuthEndpoints();
         app.MapCustomerEndpoints();
         app.MapAgentEndpoints();
+        app.MapDocumentEndpoints();
     }
     
     public static void SetupSwagger(this WebApplication app)

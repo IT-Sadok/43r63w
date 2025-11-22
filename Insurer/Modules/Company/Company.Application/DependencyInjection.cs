@@ -11,6 +11,7 @@ public static class DependencyInjection
     {
         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
         services.AddScoped<DocumentService>();
+        services.AddScoped<CompanyService>();
         return services;
     }
 }

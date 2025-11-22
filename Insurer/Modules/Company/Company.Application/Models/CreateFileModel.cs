@@ -1,4 +1,4 @@
-﻿namespace Company.Infrastructure.FileStorage.Models;
+﻿namespace Company.Application.Models;
 
 public sealed class CreateFileModel
 {

@@ -5,17 +5,17 @@ namespace Company.Application.Validators;
 
 public sealed class CreateDocumentValidator : AbstractValidator<CreateDocumentModel>
 {
-    public CreateDocumentValidator()
-    {
-        RuleFor(e => e.Name)
-            .NotNull()
-            .NotEmpty()
-            .WithMessage("Name is required.");
-        
-        
-        RuleFor(e => e.Type)
-            .IsInEnum()
-            .NotNull()
-            .WithMessage("Type is required.");
-    }
+    // public CreateDocumentValidator()
+    // {
+    //     RuleFor(e => e.Name)
+    //         .NotNull()
+    //         .NotEmpty()
+    //         .WithMessage("Name is required.");
+    //     
+    //     
+    //     RuleFor(e => e.Type)
+    //         .IsInEnum()
+    //         .NotNull()
+    //         .WithMessage("Type is required.");
+    // }
 }

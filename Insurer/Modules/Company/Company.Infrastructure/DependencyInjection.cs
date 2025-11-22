@@ -1,8 +1,11 @@
-﻿using Company.Infrastructure.FileStorage;
+﻿using Company.Infrastructure.Data;
+using Company.Infrastructure.FileStorage;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Minio;
+
 namespace Company.Infrastructure;
 
 public static class DependencyInjection
@@ -11,7 +14,7 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddScoped<IFileStorageRepository,MinioFileStorageRepository>();
+        services.AddScoped<IFileStorageRepository, MinioFileStorageRepository>();
         services.Configure<MinioSettings>(configuration.GetSection("Minio"));
         services.AddSingleton<IMinioClient>(setup =>
         {
@@ -22,6 +25,11 @@ public static class DependencyInjection
                 .WithCredentials(settings.AccessKey, settings.SecretKey)
                 .WithSSL(settings.UseSsl)
                 .Build();
+        });
+
+        services.AddDbContext<CompanyDbContext>(options =>
+        {
+            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
         });
         return services;
     }

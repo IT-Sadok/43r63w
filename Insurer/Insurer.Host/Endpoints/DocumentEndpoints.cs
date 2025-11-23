@@ -12,9 +12,9 @@ public static class DocumentEndpoints
     public static void MapDocumentEndpoints(
         this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("documents");
-
-
+        var group = app.MapGroup("documents")
+            .RequireAuthorization();
+        
         group.MapPost("", CreateDocumentAsync).DisableAntiforgery();
         group.MapGet("{id}", GetDocumentAsync).DisableAntiforgery();
     }
@@ -23,7 +23,7 @@ public static class DocumentEndpoints
         IFormFile file,
         [FromServices] DocumentService documentService,
         [FromServices] UserContextAccessor contextAccessor,
-        [FromForm] CreateDocumentModel model,
+        [FromForm] CreateDocumentModelRequest modelRequest,
         CancellationToken cancellationToken = default)
     {
         var user = contextAccessor.GetUserContext();

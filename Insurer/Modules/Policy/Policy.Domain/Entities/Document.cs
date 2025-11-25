@@ -1,4 +1,5 @@
 ﻿using Policy.Domain.Enums;
+using Shared.Enums;
 
 namespace Policy.Domain.Entities;
 

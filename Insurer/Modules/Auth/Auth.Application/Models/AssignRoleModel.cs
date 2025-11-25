@@ -4,7 +4,7 @@ namespace Auth.Application.Dtos;
 
 public sealed class AssignRoleModel
 {
-    public int UserId { get; set; }
+    public string UserId { get; set; } = null!;
     
     public Role Role { get; set; }
 }

@@ -1,10 +1,12 @@
-﻿using Auth.Application.Contracts;
-using Auth.Application.Dtos;
+﻿using Auth.Application.Dtos;
+using Auth.Application.Interfaces;
 using Auth.Domain.Enums;
 using Shared.Errors;
 using Shared.Results;
+using User.Application.Contracts;
 using User.Application.Mapper;
 using User.Application.Models;
+using User.Application.Models.Responses;
 using User.Domain.Entity;
 using User.Domain.ValueObject;
 using User.Infrastructure.Data;
@@ -12,10 +14,10 @@ using User.Infrastructure.Data;
 namespace User.Application.Services;
 
 internal sealed class AgentService(
-    IAuthServicePublic authServicePublic,
-    UserDbContext userDbContext)
+    IAuthService authServicePublic,
+    UserDbContext userDbContext) : IAgentService
 {
-    public async Task<Result<bool>> CreateAgentAsync(
+    public async Task<Result<CreateAgentResponse>> CreateAgentAsync(
         CreateAgentModel model,
         CancellationToken cancellationToken = default)
     {
@@ -46,13 +48,13 @@ internal sealed class AgentService(
 
         var roleModel = new AssignRoleModel
         {
-            UserId = entity.UserId,
+            UserId = entity.UserId.ToString(),
             Role = Role.Agent
         };
 
-        await authServicePublic.AssignRoleAsync(roleModel, cancellationToken);
+        await authServicePublic.AssignRolesAsync(roleModel, cancellationToken);
 
-        return Result<bool>.Success(true);
+        return Result<CreateAgentResponse>.Success(new CreateAgentResponse { Success = true });
     }
 
     public async Task<Result<GetAgentModel>> GetAgentAsync(

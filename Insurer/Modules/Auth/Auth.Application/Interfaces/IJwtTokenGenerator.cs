@@ -6,6 +6,12 @@ namespace Auth.Application.Interfaces
 {
     public interface IJwtTokenGenerator
     {
-        Result<string> GenerateToken(ApplicationUser user, IEnumerable<string> roles);
+        Result<GenerateTokenResponse> GenerateToken(ApplicationUser user, IEnumerable<string> roles);
     }
+}
+
+
+public sealed class GenerateTokenResponse
+{
+    public string? Token { get; set; }
 }

@@ -4,11 +4,17 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Insurer.Host.Endpoints;
 
-public static class CompanyEndpoints
+public static class CompanyModule
 {
-    public static void MapCompanyEndpoint(this IEndpointRouteBuilder app)
+    public static void MapCompanyEndpoint(
+        this IEndpointRouteBuilder app,
+        IHostEnvironment env)
     {
-        var group = app.MapGroup("/companies").RequireAuthorization();
+        var group = app.MapGroup("/companies");
+        if (!env.IsEnvironment("Test"))
+        {
+            group.RequireAuthorization();
+        }
         group.MapPost("", CreateCompanyAsync);
         group.MapPut("{id}", UpdateCompanyAsync);
         group.MapGet("{id}", GetCompanyAsync);

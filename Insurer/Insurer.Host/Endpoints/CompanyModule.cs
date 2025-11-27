@@ -10,32 +10,35 @@ public static class CompanyModule
         this IEndpointRouteBuilder app,
         IHostEnvironment env)
     {
-        var group = app.MapGroup("/companies");
-        if (!env.IsEnvironment("Test"))
-        {
-            group.RequireAuthorization();
-        }
+        var group = app.MapGroup("/companies").RequireAuthorization();
+
         group.MapPost("", CreateCompanyAsync);
         group.MapPut("{id}", UpdateCompanyAsync);
         group.MapGet("{id}", GetCompanyAsync);
     }
 
     private static async Task<IResult> GetCompanyAsync(
-        int id,
+        [FromRoute] int id,
         [FromServices] CompanyService companyService,
         CancellationToken cancellationToken = default)
     {
-       var result = await companyService.GetCompanyAsync(id, cancellationToken);
-       return result.IsSuccess
-           ? Results.Ok(result.Value)
-           : Results.BadRequest(result.Errors);
+        if (id == 0)
+            return Results.BadRequest();
+        
+        var result = await companyService.GetCompanyAsync(id, cancellationToken);
+        return result.IsSuccess
+            ? Results.Ok(result.Value)
+            : Results.BadRequest(result.Errors);
     }
-    
+
     private static async Task<IResult> CreateCompanyAsync(
         [FromBody] CreateCompanyRequest request,
         [FromServices] CompanyService companyService,
         CancellationToken cancellationToken = default)
     {
+        if (string.IsNullOrWhiteSpace(request.CompanyName))
+            return Results.BadRequest();
+
         var result = await companyService.CreateCompanyAsync(request, cancellationToken);
         return result.IsSuccess
             ? Results.Ok(result.Value)
@@ -48,6 +51,8 @@ public static class CompanyModule
         [FromServices] CompanyService companyService,
         CancellationToken cancellationToken = default)
     {
+      
+
         request.Id = id;
         var result = await companyService.UpdateCompanyAsync(request, cancellationToken);
         return result.IsSuccess

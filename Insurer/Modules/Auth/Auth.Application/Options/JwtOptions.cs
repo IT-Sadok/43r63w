@@ -2,10 +2,10 @@
 
 public class JwtOptions
 {
-    public string Key { get; init; } = null!;
-    public string Issuer { get; init; } = null!;
-    public string Audience { get; init; } = null!;
+    public string Key { get; set; } = null!;
+    public string Issuer { get; set; } = null!;
+    public string Audience { get; set; } = null!;
     
-    public int AccessTokenMinutes { get; init; } = 10;
+    public int AccessTokenMinutes { get; set; } = 10;
 }
 

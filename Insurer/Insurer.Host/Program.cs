@@ -16,12 +16,11 @@ builder.Services.AddSwagger();
 
 var app = builder.Build();
 
-
 app.UseAntiforgery();
 app.SetupExceptionHandler();
 
 app.SetupSwagger();
-app.SetupEndpoints();
+app.SetupEndpoints(app.Environment);
 
 app.UseHttpsRedirection();
 app.Run();

@@ -18,12 +18,6 @@ public class GlobalExceptionHandler : IExceptionHandler
         
         switch (exception)
         {
-            case DbUpdateException dbUpdateException:
-                problemDetails.Title = "Database Update Exception";
-                problemDetails.Status = StatusCodes.Status500InternalServerError;
-                problemDetails.Instance = httpContext.Request.Path;
-                problemDetails.Detail = dbUpdateException.Message;
-                break;
             case NullReferenceException nullReferenceException:
                 problemDetails.Title = "Null Reference Exception";
                 problemDetails.Status = StatusCodes.Status500InternalServerError;

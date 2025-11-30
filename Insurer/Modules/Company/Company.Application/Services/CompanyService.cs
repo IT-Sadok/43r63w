@@ -29,6 +29,7 @@ public sealed class CompanyService(CompanyDbContext companyDbContext)
 
         return Result<CreateCompanyResponse>.Success(new CreateCompanyResponse
         {
+            CompanyId = company.Id,
             Success = true,
         });
     }
@@ -53,7 +54,7 @@ public sealed class CompanyService(CompanyDbContext companyDbContext)
 
 
     public async Task<Result<GetCompanyResponse>> GetCompanyAsync(
-        int id, 
+        int id,
         CancellationToken cancellationToken = default)
     {
         var company = await companyDbContext.Companies.Select(e => new GetCompanyResponse
@@ -63,9 +64,9 @@ public sealed class CompanyService(CompanyDbContext companyDbContext)
                 PhoneNumber = e.Phone,
             })
             .FirstOrDefaultAsync(cancellationToken);
-        
-        return company == null 
-            ? Result<GetCompanyResponse>.Failure(ErrorsMessage.EntityError) 
+
+        return company == null
+            ? Result<GetCompanyResponse>.Failure(ErrorsMessage.EntityError)
             : Result<GetCompanyResponse>.Success(company);
     }
 }

@@ -30,5 +30,8 @@
   <Folder Name="/Solution Items/">
     <File Path="compose.yaml" />
   </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="../Tests/Insurer.Tests.Integration/Insurer.Tests.Integration.csproj" />
+  </Folder>
   <Project Path="Insurer.Host.csproj" />
 </Solution>

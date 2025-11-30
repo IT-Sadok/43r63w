@@ -3,7 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Insurer.Tests.Integration;
+namespace Insurer.Tests.Integration.Infrastructure;
 
 public static class JwtGenerator
 {

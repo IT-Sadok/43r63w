@@ -24,8 +24,8 @@ public sealed class DocumentService(
         CancellationToken cancellationToken = default)
     {
         using var ms = new MemoryStream();
-        await file.CopyToAsync(ms, cancellationToken);
 
+        await file.CopyToAsync(ms, cancellationToken);
         var fileSize = Math.Round(file.Length / (1024.0 * 1024.0), 2);
 
         if (fileSize > _minioSettings.MaxFileSize)
@@ -39,7 +39,7 @@ public sealed class DocumentService(
         };
 
         var fileResponse = await fileStorageRepository.CreateFileAsync(fileMinioModel, cancellationToken);
-        if (fileResponse != null || fileResponse?.ResponseStatusCode != HttpStatusCode.OK)
+        if (fileResponse == null || fileResponse?.ResponseStatusCode != HttpStatusCode.OK)
             return Result<CreateDocumentResponse>.Failure(ErrorsMessage.ErrorWhileUploadFile);
 
         var entity = new Domain.Entity.Document
@@ -53,8 +53,10 @@ public sealed class DocumentService(
             ObjectName = fileResponse.ObjectName,
         };
 
+
         companyDbContext.Documents.Add(entity);
         await companyDbContext.SaveChangesAsync(cancellationToken);
+
 
         return Result<CreateDocumentResponse>.Success(new CreateDocumentResponse
         {

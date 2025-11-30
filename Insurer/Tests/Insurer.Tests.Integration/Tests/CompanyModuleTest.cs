@@ -3,10 +3,9 @@ using System.Net.Http.Json;
 using Company.Application.Models.Request;
 using Company.Application.Models.Responses;
 using FluentAssertions;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
+using Insurer.Tests.Integration.Infrastructure;
 
-namespace Insurer.Tests.Integration;
+namespace Insurer.Tests.Integration.Tests;
 
 public class CompanyModuleTest :
     IClassFixture<CompanyFactory>,

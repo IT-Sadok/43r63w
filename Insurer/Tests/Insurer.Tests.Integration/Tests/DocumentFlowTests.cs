@@ -7,9 +7,7 @@ using FluentAssertions;
 using Insurer.Tests.Integration.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Minio.DataModel.Args;
-
 namespace Insurer.Tests.Integration.Tests;
-
 public class DocumentFlowTests :
     IClassFixture<IntegrationTestFixture>,
     IClassFixture<TestUserContext>
@@ -18,7 +16,7 @@ public class DocumentFlowTests :
     private readonly IntegrationTestFixture _integrationTestFixture;
 
     private const string ObjectKey = "test\\test.png";
-    private const string FilePath = "C:\\Users\\Vlad\\Desktop\\test.png";
+    private const string FilePath = "C:\\Users\\Vlad\\Desktop\\test.jpg";
 
     public DocumentFlowTests(
         IntegrationTestFixture integrationTestFixture,
@@ -29,25 +27,9 @@ public class DocumentFlowTests :
     }
 
     [Fact]
-    public async Task Minio_Should_Upload_File()
-    {
-        await using var file = File.OpenRead(FilePath);
-
-        var response = await _integrationTestFixture.Minio.MinioClient.PutObjectAsync(
-            new PutObjectArgs()
-                .WithBucket(MinioFixture.BucketName)
-                .WithObject("test")
-                .WithStreamData(file)
-                .WithObjectSize(file.Length)
-                .WithContentType("image/png"));
-
-        response.ResponseStatusCode.Should().Be(HttpStatusCode.OK);
-    }
-
-    [Fact]
     public async Task Minio_Should_Upload_PressignUrl_And_Upload_Content()
     {
-        await UploadDocument();
+        await UploadDocumentAsync();
 
         var url = await _integrationTestFixture.Minio.MinioClient.PresignedGetObjectAsync(
             new PresignedGetObjectArgs()
@@ -90,10 +72,9 @@ public class DocumentFlowTests :
             CreatedAt = DateTime.Now,
             UpdatedAt = DateTime.Now,
         };
-        
-            dbContext.Companies.Add(company);
-            await dbContext.SaveChangesAsync();
-        
+
+        dbContext.Companies.Add(company);
+        await dbContext.SaveChangesAsync();
 
 
         var httpClient = _integrationTestFixture.Factory.CreateDefaultClient();
@@ -121,12 +102,80 @@ public class DocumentFlowTests :
         }
 
         var responseContent = await responseMessage.Content.ReadFromJsonAsync<CreateDocumentResponse>();
-        
+
         responseContent.Should().NotBeNull();
         responseContent.Success.Should().BeTrue();
     }
 
-    private async Task UploadDocument()
+    [Fact]
+    public async Task UploadDocument_Should_Return_BadRequest_When_FileLenght_MoreThan_5MB()
+    {
+        await _integrationTestFixture.Factory.ResetDbAsync();
+
+        await using var scope = _integrationTestFixture.Factory.Services.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<CompanyDbContext>();
+
+        var company = new Company.Domain.Entity.Company
+        {
+            CompanyName = "test-company",
+            RegistrationNumber = 3487587158,
+            Phone = "38143827574",
+            CreatedAt = DateTime.Now,
+            UpdatedAt = DateTime.Now,
+        };
+
+        dbContext.Companies.Add(company);
+        await dbContext.SaveChangesAsync();
+        
+        var httpClient = _integrationTestFixture.Factory.CreateDefaultClient();
+        var token = JwtGenerator.GenerateToken();
+        var fileBytes = await File.ReadAllBytesAsync(FilePath);
+
+        var fileContent = new ByteArrayContent(fileBytes);
+        fileContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
+        {
+            Name = "\"file\"",
+            FileName = "\"test.jpg\"",
+        };
+        fileContent.Headers.ContentType = new MediaTypeHeaderValue("image/jpg");
+
+        var form = new MultipartFormDataContent();
+        form.Add(fileContent, "file", "test.jpg");
+
+        httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+        var responseMessage = await httpClient.PostAsync("/documents", form);
+    }
+    
+
+    [Fact]
+    public async Task GetDocument_Should_Return_Ok_And_CorrectUrl()
+    {
+        var httpClient = _integrationTestFixture.Factory.CreateDefaultClient();
+         await UploadDocumentAsync();
+        var response = await httpClient.GetAsync($"/documents/{ObjectKey}");  
+        var content = await response.Content.ReadFromJsonAsync<GetFileResponse>();
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().NotBeNull();
+        content.FileUrl.Should().NotBeNull();
+    }
+    
+    [Fact]
+    public async Task GetDocument_Should_Return_BadRequest_When_FileNotFound()
+    {
+        await UploadDocumentAsync();
+        var user = _userContextAccessor.GetUserContext();
+        var id = "";
+
+        var httpClient = _integrationTestFixture.Factory.CreateDefaultClient();
+
+        var response = await httpClient.GetAsync($"/documents/{id}");
+        var content = await response.Content.ReadFromJsonAsync<GetFileResponse>();
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        content!.FileUrl.Should().BeNull();
+    }
+
+
+    private async Task UploadDocumentAsync()
     {
         await using var file = File.OpenRead(FilePath);
 

@@ -40,7 +40,7 @@ public static class DocumentEndpoints
     }
 
     private static async Task<IResult> GetDocumentAsync(
-        string id,
+        [FromRoute]string id,
         [FromServices] DocumentService documentService,
         CancellationToken cancellationToken = default)
     {

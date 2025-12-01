@@ -29,7 +29,7 @@ public sealed class DocumentService(
         var fileSize = Math.Round(file.Length / (1024.0 * 1024.0), 2);
 
         if (fileSize > _minioSettings.MaxFileSize)
-            return Result<CreateDocumentResponse>.Failure("Max file [20MB] size exceeded");
+            return Result<CreateDocumentResponse>.Failure("Max file [5MB] size exceeded");
 
         var fileMinioModel = new MinioUploadModel
         {
@@ -41,7 +41,7 @@ public sealed class DocumentService(
         var fileResponse = await fileStorageRepository.CreateFileAsync(fileMinioModel, cancellationToken);
         if (fileResponse == null || fileResponse?.ResponseStatusCode != HttpStatusCode.OK)
             return Result<CreateDocumentResponse>.Failure(ErrorsMessage.ErrorWhileUploadFile);
-
+        
         var entity = new Domain.Entity.Document
         {
             CompanyId = 1,

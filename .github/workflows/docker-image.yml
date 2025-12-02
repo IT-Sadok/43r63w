@@ -1,4 +1,4 @@
-name: Recreated image and push to docker hub
+name: Created docker image
 
 on:
   push:
@@ -6,11 +6,7 @@ on:
     
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
-
-    
     steps:
 
     - name: Checkoout

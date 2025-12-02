@@ -2,5 +2,5 @@
 
 public sealed class GetFileResponse
 {
-    public string FileUrl { get; set; } = null!;
+    public string? FileUrl { get; set; }
 }

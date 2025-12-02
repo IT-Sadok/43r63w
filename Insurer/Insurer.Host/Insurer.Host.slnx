@@ -1,4 +1,6 @@
 <Solution>
+  <Folder Name="/.github/" />
+  <Folder Name="/.github/worflows/" />
   <Folder Name="/Modules/" />
   <Folder Name="/Modules/Auth/">
     <Project Path="..\Modules\Auth\Auth.Bootstrapper\Auth.Bootstrapper.csproj" />

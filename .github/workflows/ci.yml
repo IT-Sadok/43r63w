@@ -1,0 +1,34 @@
+name: ci
+on:
+  push:
+    branches:
+      - "task-*"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+          
+      - name: Restore
+        run: dotnet restore
+               
+      - name: Build
+        run: dotnet build --configuration Release --no-restore 
+        
+      - name: Test
+        run: dotnet test --no-build
+        
+      - name: Create pull request to dev
+        if: success()
+        uses: peter-evans/create-pull-request@v6
+        with:
+         token: ${{ secrets.GITHUB_TOKEN }}
+         branch: ${{ github.ref_name }}
+         base: dev
+         title: "Pull request from ${{ github.ref_name }}"

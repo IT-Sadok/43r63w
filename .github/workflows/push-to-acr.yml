@@ -22,7 +22,7 @@ jobs:
         uses: actions/setup-dotnet@v5.0.1
 
       - name: Restore
-        run: dotnet restore
+        run: dotnet restore Insurer/Insurer.Host/Insurer.Host.csproj
 
       - name: Build 
         run: dotnet build --configuration Release -no--restore

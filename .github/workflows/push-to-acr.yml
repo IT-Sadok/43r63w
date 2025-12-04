@@ -27,9 +27,11 @@ jobs:
 
       - name: Build Docker image
         run: |
-            docker build -t $REGISTRY/$IMAGE_NAME:latest \
-            -f Insurer/Insurer.Host/Dockerfile Insurer/Insurer.Host \
+            docker buildx build \
+            -t $REGISTRY/$IMAGE_NAME:latest \
+            -f Insurer.Host/Dockerfile \
             .
+
 
             docker tag $REGISTRY/$IMAGE_NAME:latest \
             $REGISTRY/$IMAGE_NAME:${{ github.sha }}

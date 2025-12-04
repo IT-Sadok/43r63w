@@ -1,0 +1,35 @@
+name: Build and push to ACR
+
+on:
+  push:
+    branches: ["main"]
+
+env:
+  REGISTRY: insurerapi.azurecr.io
+  IMAGE_NAME: insurer-api
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Log in Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Azure Container Registry login
+        run: az acr login --name insurerapi
+
+      - name: Build Docker image
+        run: |
+          docker build -t $REGISTRY/$IMAGE_NAME:latest .
+          docker tag $REGISTRY/$IMAGE_NAME:latest $REGISTRY/$IMAGE_NAME:${{ github.sha }}
+          
+      - name: Push Docker image
+        run: |
+          docker push $REGISTRY/$IMAGE_NAME:latest
+          docker push $REGISTRY/$IMAGE_NAME:${{ github.sha }}

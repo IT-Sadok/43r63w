@@ -29,8 +29,8 @@ jobs:
         run: |
             docker buildx build \
             -t $REGISTRY/$IMAGE_NAME:latest \
-            -f Insurer.Host/Dockerfile \
-            .
+            -f Insurer/Insurer.Host/Dockerfile \
+            Insurer
 
 
             docker tag $REGISTRY/$IMAGE_NAME:latest \

@@ -1,4 +1,6 @@
 <Solution>
+  <Folder Name="/.github/" />
+  <Folder Name="/.github/worflows/" />
   <Folder Name="/Modules/" />
   <Folder Name="/Modules/Auth/">
     <Project Path="..\Modules\Auth\Auth.Bootstrapper\Auth.Bootstrapper.csproj" />
@@ -29,6 +31,9 @@
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path="compose.yaml" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="../Tests/Insurer.Tests.Integration/Insurer.Tests.Integration.csproj" />
   </Folder>
   <Project Path="Insurer.Host.csproj" />
 </Solution>

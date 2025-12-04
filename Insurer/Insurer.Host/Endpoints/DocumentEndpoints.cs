@@ -4,6 +4,7 @@ using Company.Application.Services;
 using Company.Infrastructure.FileStorage;
 using Insurer.Host.Utils;
 using Microsoft.AspNetCore.Mvc;
+using Shared.ContextAccessor;
 
 namespace Insurer.Host.Endpoints;
 
@@ -22,7 +23,7 @@ public static class DocumentEndpoints
     private static async Task<IResult> CreateDocumentAsync(
         IFormFile file,
         [FromServices] DocumentService documentService,
-        [FromServices] UserContextAccessor contextAccessor,
+        [FromServices] IUserContextAccessor contextAccessor,
         [FromForm] CreateDocumentModelRequest modelRequest,
         CancellationToken cancellationToken = default)
     {
@@ -39,7 +40,7 @@ public static class DocumentEndpoints
     }
 
     private static async Task<IResult> GetDocumentAsync(
-        string id,
+        [FromRoute]string id,
         [FromServices] DocumentService documentService,
         CancellationToken cancellationToken = default)
     {

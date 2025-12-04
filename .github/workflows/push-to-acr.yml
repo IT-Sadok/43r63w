@@ -41,3 +41,8 @@ jobs:
         run: |
           docker push $REGISTRY/$IMAGE_NAME:latest
           docker push $REGISTRY/$IMAGE_NAME:${{ github.sha }}
+
+
+
+
+

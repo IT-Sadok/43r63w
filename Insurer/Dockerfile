@@ -32,7 +32,7 @@ COPY Modules/Policy/Policy.Infrastructure/Policy.Infrastructure.csproj Modules/P
 COPY Modules/Policy/Policy.Application/Policy.Application.csproj Modules/Policy/Policy.Application/
 COPY Modules/Policy/Policy.Bootstrapper/Policy.Bootstrapper.csproj Modules/Policy/Policy.Bootstrapper/
 
-COPY Insurer/Shared/Shared.csproj Shared/
+COPY Shared/Shared/Shared.csproj Shared/Shared/
 
 # Restore dependencies
 RUN dotnet restore Insurer.Host/Insurer.Host.csproj

@@ -1,4 +1,9 @@
-﻿using Insurer.Host.Endpoints;
+﻿using Auth.Infrastructure.Data;
+using Company.Infrastructure.Data;
+using Insurer.Host.Endpoints;
+using Microsoft.EntityFrameworkCore;
+using Policy.Infrastructure.Data;
+using User.Infrastructure.Data;
 
 namespace Insurer.Host.Configuration;
 
@@ -26,4 +31,35 @@ public static class MiddlewareExtension
     {
         app.UseExceptionHandler();
     }
+
+    public static async Task ApplyMigrationAsync(this IApplicationBuilder app)
+    {
+        using var scope = app.ApplicationServices.CreateScope();
+
+        var authDb = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
+        var authPendingMigration = await authDb.Database.GetPendingMigrationsAsync();
+
+        if (authPendingMigration.Any())
+            await authDb.Database.MigrateAsync();
+        
+        
+        var companyDb = scope.ServiceProvider.GetRequiredService<CompanyDbContext>();
+        var companyPendingMigration = await authDb.Database.GetPendingMigrationsAsync();
+
+        if (companyPendingMigration.Any())
+            await companyDb.Database.MigrateAsync();
+        
+        var policyDb = scope.ServiceProvider.GetRequiredService<PolicyDbContext>();
+        var policyPendingMigration = await authDb.Database.GetPendingMigrationsAsync();
+
+        if (policyPendingMigration.Any())
+            await policyDb.Database.MigrateAsync();
+        
+        var userDb = scope.ServiceProvider.GetRequiredService<UserDbContext>();
+        var userPendingMigration = await authDb.Database.GetPendingMigrationsAsync();
+
+        if (userPendingMigration.Any())
+            await userDb.Database.MigrateAsync();
+    }
 }
+

@@ -27,6 +27,9 @@ jobs:
         with: 
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      - name: Azure Container Registry login 
+        run: az acr login --name insurerapi
+
       - name: Build Docker image
         run: |
           docker buildx build \

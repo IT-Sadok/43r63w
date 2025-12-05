@@ -24,10 +24,8 @@ jobs:
 
       - name: Log in to ACR
         uses: azure/docker-login@v2
-        with:
-          login-server: ${{ env.REGISTRY }}
-          username: ${{ secrets.ACR_USERNAME }}
-          password: ${{ secrets.ACR_PASSWORD }}
+        with: 
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Build Docker image
         run: |

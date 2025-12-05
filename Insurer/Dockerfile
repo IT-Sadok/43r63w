@@ -14,19 +14,34 @@ ARG BUILD_CONFIGURATION=Release
 
 WORKDIR /src
 
-# Copy solution-level directories
-COPY ./Insurer.Host/Insurer.Host.csproj ./Insurer.Host/
-COPY ./Modules ./Modules
-COPY ./Shared ./Shared
+# Copy project files individually to improve caching
+COPY Insurer.Host/Insurer.Host.csproj Insurer.Host/
 
-# Restore only the host project (loads deps from modules)
-RUN dotnet restore ./Insurer.Host/Insurer.Host.csproj
+COPY Modules/User/User.Infrastructure/User.Infrastructure.csproj Modules/User/User.Infrastructure/
+COPY Modules/User/User.Domain/User.Domain.csproj Modules/User/User.Domain/
+COPY Modules/User/User.Bootstrapper/User.Bootstrapper.csproj Modules/User/User.Bootstrapper/
+COPY Modules/User/User.Application/User.Application.csproj Modules/User/User.Application/
 
-# Copy entire project after restoring
+COPY Modules/Auth/Auth.Domain/Auth.Domain.csproj Modules/Auth/Auth.Domain/
+COPY Modules/Auth/Auth.Application/Auth.Application.csproj Modules/Auth/Auth.Application/
+COPY Modules/Auth/Auth.Infrastructure/Auth.Infrastructure.csproj Modules/Auth/Auth.Infrastructure/
+COPY Modules/Auth/Auth.Bootstrapper/Auth.Bootstrapper.csproj Modules/Auth/Auth.Bootstrapper/
+
+COPY Modules/Policy/Policy.Domain/Policy.Domain.csproj Modules/Policy/Policy.Domain/
+COPY Modules/Policy/Policy.Infrastructure/Policy.Infrastructure.csproj Modules/Policy/Policy.Infrastructure/
+COPY Modules/Policy/Policy.Application/Policy.Application.csproj Modules/Policy/Policy.Application/
+COPY Modules/Policy/Policy.Bootstrapper/Policy.Bootstrapper.csproj Modules/Policy/Policy.Bootstrapper/
+
+COPY Shared/Shared.csproj Shared/
+
+# Restore dependencies
+RUN dotnet restore Insurer.Host/Insurer.Host.csproj
+
+# Copy full source
 COPY . .
 
 # Build
-RUN dotnet build ./Insurer.Host/Insurer.Host.csproj \
+RUN dotnet build Insurer.Host/Insurer.Host.csproj \
     -c $BUILD_CONFIGURATION \
     -o /app/build
 
@@ -35,7 +50,7 @@ RUN dotnet build ./Insurer.Host/Insurer.Host.csproj \
 # =======================
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish ./Insurer.Host/Insurer.Host.csproj \
+RUN dotnet publish Insurer.Host/Insurer.Host.csproj \
     -c $BUILD_CONFIGURATION \
     -o /app/publish \
     /p:UseAppHost=false

@@ -8,7 +8,6 @@ on:
 env:
   REGISTRY: insurerapi.azurecr.io
   IMAGE_NAME: insurer-api
-  REASOURCEGROUP: insurer
 
 jobs:
   build-and-push:
@@ -17,43 +16,31 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-
-      - name: Build .NET
-        uses: actions/setup-dotnet@v5.0.1
-
-      - name: Restore
-        run: dotnet restore Insurer/Insurer.Host/Insurer.Host.csproj
-
-      - name: Build 
-        run: dotnet build --configuration Release -no--restore
-
-      - name: Log in Azure
+        
+      - name: Log in to Azure
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Azure Container Registry login
-        run: az acr login --name insurerapi
+      - name: Log in to ACR
+        uses: azure/docker-login@v2
+        with:
+          login-server: ${{ env.REGISTRY }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
 
       - name: Build Docker image
         run: |
-            docker buildx build \
+          docker buildx build \
+            --load \
             -t $REGISTRY/$IMAGE_NAME:latest \
             -f Insurer/Insurer.Host/Dockerfile \
             Insurer
 
-            docker tag $REGISTRY/$IMAGE_NAME:latest \
+          docker tag $REGISTRY/$IMAGE_NAME:latest \
             $REGISTRY/$IMAGE_NAME:${{ github.sha }}
 
-          
       - name: Push Docker image
         run: |
           docker push $REGISTRY/$IMAGE_NAME:latest
           docker push $REGISTRY/$IMAGE_NAME:${{ github.sha }}
-
-          
-
-
-
-
-

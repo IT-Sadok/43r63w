@@ -1,47 +1,45 @@
-name: Build and push to ACR
+name: Build and push to ACR 
 
 on:
   workflow_dispatch:
   push:
     branches: ["main"]
-
+    
 env:
-  REGISTRY: insurerapi.azurecr.io
-  IMAGE_NAME: insurer-api
+ REGISTRY: insurerapi.azurecr.io 
+ IMAGE_NAME: insurer-api 
+ REASOURCEGROUP: insurer
 
-jobs:
-  build-and-push:
-    runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+jobs: 
+  build-and-push: 
+   runs-on: ubuntu-latest
+
+   steps: 
+   - name: Checkout repo 
+     uses: actions/checkout@v4
+     
+   - name: Log in Azure 
+     uses: azure/login@v1 
+     with: 
+       creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+   - name: Azure Container Registry login 
+     run: az acr login --name insurerapi
+      
+   - name: Build Docker image 
+     run: | 
+         docker buildx build \
+         -t $REGISTRY/$IMAGE_NAME:latest \
+         -f Insurer/Insurer.Host/Dockerfile \
+         Insurer
         
-      - name: Log in to Azure
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+         docker tag $REGISTRY/$IMAGE_NAME:latest \
+         $REGISTRY/$IMAGE_NAME:${{ github.sha }}
 
-      - name: Log in to ACR
-        uses: azure/docker-login@v2
-        with: 
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Azure Container Registry login 
-        run: az acr login --name insurerapi
-
-      - name: Build Docker image
-        run: |
-          docker buildx build \
-            --load \
-            -t $REGISTRY/$IMAGE_NAME:latest \
-            -f Insurer/Insurer.Host/Dockerfile \
-            Insurer
-
-          docker tag $REGISTRY/$IMAGE_NAME:latest \
-            $REGISTRY/$IMAGE_NAME:${{ github.sha }}
-
-      - name: Push Docker image
-        run: |
-          docker push $REGISTRY/$IMAGE_NAME:latest
-          docker push $REGISTRY/$IMAGE_NAME:${{ github.sha }}
+   - name: Push Docker image 
+     run: | 
+      docker push $REGISTRY/$IMAGE_NAME:latest
+      docker push $REGISTRY/$IMAGE_NAME:${{ github.sha }}
+        
+        

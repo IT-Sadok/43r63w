@@ -16,7 +16,7 @@ builder.Services.AddSwagger();
 
 var app = builder.Build();
 
-await app.ApplyMigrationAsync();
+//await app.ApplyMigrationAsync();
 
 app.UseAntiforgery();
 app.SetupExceptionHandler();

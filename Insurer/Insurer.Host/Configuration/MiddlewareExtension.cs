@@ -44,19 +44,19 @@ public static class MiddlewareExtension
         
         
         var companyDb = scope.ServiceProvider.GetRequiredService<CompanyDbContext>();
-        var companyPendingMigration = await authDb.Database.GetPendingMigrationsAsync();
+        var companyPendingMigration = await companyDb.Database.GetPendingMigrationsAsync();
 
         if (companyPendingMigration.Any())
             await companyDb.Database.MigrateAsync();
         
         var policyDb = scope.ServiceProvider.GetRequiredService<PolicyDbContext>();
-        var policyPendingMigration = await authDb.Database.GetPendingMigrationsAsync();
+        var policyPendingMigration = await policyDb.Database.GetPendingMigrationsAsync();
 
         if (policyPendingMigration.Any())
             await policyDb.Database.MigrateAsync();
         
         var userDb = scope.ServiceProvider.GetRequiredService<UserDbContext>();
-        var userPendingMigration = await authDb.Database.GetPendingMigrationsAsync();
+        var userPendingMigration = await userDb.Database.GetPendingMigrationsAsync();
 
         if (userPendingMigration.Any())
             await userDb.Database.MigrateAsync();

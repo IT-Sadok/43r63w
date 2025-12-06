@@ -1,6 +1,7 @@
 ﻿using Azure.Storage.Blobs;
 using Company.Infrastructure.Data;
 using Company.Infrastructure.FileStorage.Models;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Minio.DataModel.Response;
 
@@ -10,19 +11,25 @@ public class AzureBlobFileStorageRepository : IFileStorageRepository
 {
     private readonly CompanyDbContext _companyDbContext;
     private readonly BlobContainerClient _blobContainerClient;
+    private readonly ILogger<AzureBlobFileStorageRepository> _logger;
 
     public AzureBlobFileStorageRepository(
         CompanyDbContext companyDbContext,
         IOptions<AzureBlobSettings> azureSettings,
-        BlobServiceClient blobServiceClient)
+        BlobServiceClient blobServiceClient,
+        ILogger<AzureBlobFileStorageRepository> logger)
     {
         _companyDbContext = companyDbContext;
-
+        
+        _logger = logger;
+        
+        _logger.LogInformation($"{azureSettings.Value.ConnectionString}/{azureSettings.Value.Container}");
+        
         _blobContainerClient = blobServiceClient.GetBlobContainerClient(azureSettings.Value.Container);
-
+        
         _blobContainerClient.CreateIfNotExists();
     }
-    
+
     public Task<PutObjectResponse?> CreateFileAsync(
         FileUploadModel model,
         CancellationToken cancellationToken = default)

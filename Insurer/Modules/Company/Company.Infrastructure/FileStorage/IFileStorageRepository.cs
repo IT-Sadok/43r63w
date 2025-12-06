@@ -7,7 +7,7 @@ namespace Company.Infrastructure.FileStorage;
 public interface IFileStorageRepository
 {
     Task<PutObjectResponse?> CreateFileAsync(
-        MinioUploadModel model,
+        FileUploadModel model,
         CancellationToken cancellationToken = default);
 
     Task<string?> GetFileUrlAsync(

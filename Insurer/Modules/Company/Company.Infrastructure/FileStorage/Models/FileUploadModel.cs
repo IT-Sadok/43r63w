@@ -1,6 +1,6 @@
 ﻿namespace Company.Infrastructure.FileStorage.Models;
 
-public sealed class MinioUploadModel
+public sealed class FileUploadModel
 {
     public string ObjectKey { get; set; } = null!;
     

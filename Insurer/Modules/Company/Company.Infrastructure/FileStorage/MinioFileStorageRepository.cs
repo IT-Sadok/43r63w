@@ -20,7 +20,7 @@ public class MinioFileStorageRepository(
     private readonly MinioSettings _minioSettings = minioSettings.Value;
 
     public async Task<PutObjectResponse?> CreateFileAsync(
-        MinioUploadModel model,
+        FileUploadModel model,
         CancellationToken cancellationToken = default)
     {
         var isBucketExists = await minioClient.BucketExistsAsync(

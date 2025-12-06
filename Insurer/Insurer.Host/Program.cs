@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddPolicyModule(builder.Configuration);
 builder.Services.AddAuthModule(builder.Configuration);
 builder.Services.AddUserModule(builder.Configuration);
-builder.Services.AddCompanyModule(builder.Configuration);
+builder.Services.AddCompanyModule(builder.Configuration, builder.Environment);
 
 builder.Services.AddHostService();
 builder.Services.AddSwagger();

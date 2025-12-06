@@ -31,7 +31,7 @@ public sealed class DocumentService(
         if (fileSize > _minioSettings.MaxFileSize)
             return Result<CreateDocumentResponse>.Failure("Max file [5MB] size exceeded");
 
-        var fileMinioModel = new MinioUploadModel
+        var fileMinioModel = new FileUploadModel
         {
             ObjectKey = $"/documents/{Guid.NewGuid()}/{file.FileName}",
             Content = ms.ToArray(),

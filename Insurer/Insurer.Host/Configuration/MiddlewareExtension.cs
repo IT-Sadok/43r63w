@@ -62,7 +62,7 @@ public static class MiddlewareExtension
             await userDb.Database.MigrateAsync();
     }
 
-    public static async Task RedirectToSwaggerUiAsync(this IApplicationBuilder app)
+    public static void RedirectToSwaggerUiAsync(this IApplicationBuilder app)
     {
         app.Use(async (context, next) =>
         {

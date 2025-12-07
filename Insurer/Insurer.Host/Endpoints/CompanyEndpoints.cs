@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Insurer.Host.Endpoints;
 
-public static class CompanyModule
+public static class CompanyEndpoints
 {
     public static void MapCompanyEndpoint(
         this IEndpointRouteBuilder app,

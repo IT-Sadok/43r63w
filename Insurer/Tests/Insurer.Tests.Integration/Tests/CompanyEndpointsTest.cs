@@ -7,13 +7,13 @@ using Insurer.Tests.Integration.Infrastructure;
 
 namespace Insurer.Tests.Integration.Tests;
 
-public class CompanyModuleTest :
+public class CompanyEndpointsTest :
     IClassFixture<CompanyFactory>,
     IAsyncLifetime
 {
     private readonly CompanyFactory _companyFactory;
 
-    public CompanyModuleTest(CompanyFactory factory)
+    public CompanyEndpointsTest(CompanyFactory factory)
     {
         _companyFactory = factory;
     }

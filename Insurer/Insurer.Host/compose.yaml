@@ -16,6 +16,20 @@
     command: server /data --console-address ":9001"
     volumes:
         - minio_data:/data
-          
+        
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server
+    container_name: insurer-db
+    environment:
+        ACCEPT_EULA: "Y"                  
+        MSSQL_PID: "Developer"               
+        SA_PASSWORD: "MyStrongPassw0rd!"
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql_data:/var/opt/mssql          
+
+  
 volumes:
   minio_data:
+  mssql_data:

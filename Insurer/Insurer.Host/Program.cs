@@ -24,5 +24,5 @@ app.SetupExceptionHandler();
 app.SetupSwagger();
 app.SetupEndpoints(app.Environment);
 
-    //app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.Run();

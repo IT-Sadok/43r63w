@@ -33,13 +33,13 @@ public static class AuthEndpoints
 
     private static async Task<IResult> LoginAsync(
         [FromServices] IAuthService authService,
-        LoginModel request,
+        [FromBody] LoginModel request,
         CancellationToken cancellationToken)
     {
         var result = await authService.LoginAsync(request, cancellationToken);
         return result.IsSuccess
             ? Results.Ok(result.Value)
-            : Results.BadRequest(result.Errors);
+            : Results.BadRequest(result.ErrorMessage);
     }
 
     private static async Task<IResult> MeAsync(
@@ -60,7 +60,7 @@ public static class AuthEndpoints
     {
         var user = userContextAccessor.GetUserContext();
         model.UserId = user.UserId!;
-        
+
         var result = await authService.AssignRolesAsync(model, cancellationToken);
         return result.IsSuccess
             ? Results.Ok("Succeeded")

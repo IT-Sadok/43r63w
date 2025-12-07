@@ -9,7 +9,8 @@ namespace Auth.Application.Services;
 internal sealed class AuthService(
     UserManager<ApplicationUser> userManager,
     IJwtTokenGenerator jwtTokenGenerator,
-    IUserContextAccessor userContextAccessor) : IAuthService
+    IUserContextAccessor userContextAccessor,
+    RoleManager<ApplicationRole> roleManager) : IAuthService
 {
     public async Task<Result<RegisterResponse>> RegisterAsync(RegisterModel registerDto,
         CancellationToken cancellationToken)
@@ -19,7 +20,11 @@ internal sealed class AuthService(
 
         if (result.Succeeded)
         {
-            await userManager.AddToRoleAsync(user, nameof(registerDto.Role));
+            var isRoleExists = await roleManager.RoleExistsAsync(registerDto.Role.ToString()!);
+            if(!isRoleExists)
+                await roleManager.CreateAsync(new ApplicationRole { Name = registerDto.Role.ToString() });
+            
+            await userManager.AddToRoleAsync(user, registerDto.Role.ToString()!);
         }
 
         return !result.Succeeded

@@ -41,25 +41,37 @@ public static class MiddlewareExtension
 
         if (authPendingMigration.Any())
             await authDb.Database.MigrateAsync();
-        
-        
+
+
         var companyDb = scope.ServiceProvider.GetRequiredService<CompanyDbContext>();
         var companyPendingMigration = await companyDb.Database.GetPendingMigrationsAsync();
 
         if (companyPendingMigration.Any())
             await companyDb.Database.MigrateAsync();
-        
+
         var policyDb = scope.ServiceProvider.GetRequiredService<PolicyDbContext>();
         var policyPendingMigration = await policyDb.Database.GetPendingMigrationsAsync();
 
         if (policyPendingMigration.Any())
             await policyDb.Database.MigrateAsync();
-        
+
         var userDb = scope.ServiceProvider.GetRequiredService<UserDbContext>();
         var userPendingMigration = await userDb.Database.GetPendingMigrationsAsync();
 
         if (userPendingMigration.Any())
             await userDb.Database.MigrateAsync();
     }
-}
 
+    public static async Task RedirectToSwaggerUiAsync(this IApplicationBuilder app)
+    {
+        app.Use(async (context, next) =>
+        {
+            if (context.Request.Path == "/")
+            {
+                context.Response.Redirect("/swagger/index.html");
+                return;
+            }
+            await next();
+        });
+    }
+}

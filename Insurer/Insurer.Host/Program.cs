@@ -24,5 +24,7 @@ app.SetupExceptionHandler();
 app.SetupSwagger();
 app.SetupEndpoints(app.Environment);
 
+await app.RedirectToSwaggerUiAsync();
+
 //app.UseHttpsRedirection();
 app.Run();

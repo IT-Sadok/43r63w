@@ -18,7 +18,7 @@ public static class MiddlewareExtension
         app.MapDocumentEndpoints();
         app.MapCompanyEndpoint(env);
         
-        app.MapGet("/swagger", () => Results.Redirect("/swagger"));
+        app.MapGet("/", () => Results.Redirect("/swagger"));
     }
 
     public static void SetupSwagger(this WebApplication app)

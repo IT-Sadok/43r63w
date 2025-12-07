@@ -4,9 +4,7 @@ using Insurer.Host.Endpoints;
 using Microsoft.EntityFrameworkCore;
 using Policy.Infrastructure.Data;
 using User.Infrastructure.Data;
-
 namespace Insurer.Host.Configuration;
-
 public static class MiddlewareExtension
 {
     public static void SetupEndpoints(
@@ -19,6 +17,8 @@ public static class MiddlewareExtension
         app.MapAgentEndpoints();
         app.MapDocumentEndpoints();
         app.MapCompanyEndpoint(env);
+        
+        app.MapGet("/swagger", () => Results.Redirect("/swagger"));
     }
 
     public static void SetupSwagger(this WebApplication app)
@@ -61,17 +61,5 @@ public static class MiddlewareExtension
         if (userPendingMigration.Any())
             await userDb.Database.MigrateAsync();
     }
-
-    public static void RedirectToSwaggerUiAsync(this IApplicationBuilder app)
-    {
-        app.Use(async (context, next) =>
-        {
-            if (context.Request.Path == "/")
-            {
-                context.Response.Redirect("/swagger/index.html");
-                return;
-            }
-            await next();
-        });
-    }
+    
 }

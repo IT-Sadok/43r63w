@@ -22,7 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Modules\Auth\Auth.Bootstrapper\Auth.Bootstrapper.csproj" />
     <ProjectReference Include="..\Modules\Company\Company.Bootstrapper\Company.Bootstrapper.csproj" />
     <ProjectReference Include="..\Modules\Policy\Policy.Bootstrapper\Policy.Bootstrapper.csproj" />
     <ProjectReference Include="..\Modules\User\User.Bootstrapper\User.Bootstrapper.csproj" />

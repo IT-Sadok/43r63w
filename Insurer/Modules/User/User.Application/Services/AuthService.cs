@@ -1,10 +1,12 @@
-﻿using Auth.Application.Dtos;
-using Auth.Application.Models.Responses;
-using Auth.Domain.Domain;
+﻿using Microsoft.AspNetCore.Identity;
 using Shared.ContextAccessor;
 using Shared.Results;
+using User.Application.Interfaces;
+using User.Application.Mapper;
+using User.Application.Models.Auth;
+using User.Domain.Entity;
 
-namespace Auth.Application.Services;
+namespace User.Application.Services;
 
 internal sealed class AuthService(
     UserManager<ApplicationUser> userManager,

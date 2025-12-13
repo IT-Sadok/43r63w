@@ -1,4 +1,4 @@
-﻿namespace Auth.Application.Dtos;
+﻿namespace User.Application.Models.Auth;
 
 public sealed class UserModel
 {

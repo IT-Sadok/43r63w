@@ -1,11 +1,14 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Auth.Application.Options;
-using Auth.Domain.Domain;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Shared.Results;
+using User.Application.Interfaces;
+using User.Application.Options;
+using User.Domain.Entity;
 
-namespace Auth.Application.Services;
+namespace User.Application.Services;
 
 public class JwtTokenGenerator(IOptions<JwtOptions> options) : IJwtTokenGenerator
 {

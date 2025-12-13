@@ -1,7 +1,7 @@
-﻿using Auth.Application.Dtos;
-using Auth.Domain.Domain;
+﻿using User.Application.Models.Auth;
+using User.Domain.Entity;
 
-namespace Auth.Application.Mapping;
+namespace User.Application.Mapper;
 
 public static class ApplicationUserMapper
 {

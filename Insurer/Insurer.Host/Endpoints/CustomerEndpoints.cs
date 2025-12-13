@@ -1,9 +1,9 @@
-﻿using Auth.Domain.Enums;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.ContextAccessor;
-using User.Application.Contracts;
+using User.Application.Interfaces;
 using User.Application.Models;
+using User.Domain.Enums;
 
 namespace Insurer.Host.Endpoints;
 

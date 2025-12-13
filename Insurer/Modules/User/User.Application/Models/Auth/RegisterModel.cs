@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Auth.Domain.Enums;
+using User.Domain.Enums;
 
-namespace Auth.Application.Dtos;
+namespace User.Application.Models.Auth;
 
 public sealed class RegisterModel
 {

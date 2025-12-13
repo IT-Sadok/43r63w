@@ -1,8 +1,7 @@
-﻿using Auth.Application.Dtos;
-using Auth.Application.Models.Responses;
-using Shared.Results;
+﻿using Shared.Results;
+using User.Application.Models.Auth;
 
-namespace Auth.Application.Interfaces
+namespace User.Application.Interfaces
 {
     public interface IAuthService
     {

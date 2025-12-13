@@ -1,4 +1,4 @@
-﻿namespace Auth.Application.Models.Responses;
+﻿namespace User.Application.Models.Auth;
 
 public sealed class RegisterResponse
 {

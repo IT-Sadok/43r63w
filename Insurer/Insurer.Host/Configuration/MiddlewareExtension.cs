@@ -41,8 +41,7 @@ public static class MiddlewareExtension
 
         if (authPendingMigration.Any())
             await authDb.Database.MigrateAsync();
-
-
+        
         var companyDb = scope.ServiceProvider.GetRequiredService<CompanyDbContext>();
         var companyPendingMigration = await companyDb.Database.GetPendingMigrationsAsync();
 

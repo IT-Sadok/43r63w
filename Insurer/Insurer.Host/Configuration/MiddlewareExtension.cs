@@ -1,5 +1,4 @@
-﻿using Auth.Infrastructure.Data;
-using Company.Infrastructure.Data;
+﻿using Company.Infrastructure.Data;
 using Insurer.Host.Endpoints;
 using Microsoft.EntityFrameworkCore;
 using Policy.Infrastructure.Data;
@@ -35,14 +34,7 @@ public static class MiddlewareExtension
     public static async Task ApplyMigrationAsync(this IApplicationBuilder app)
     {
         using var scope = app.ApplicationServices.CreateScope();
-
-        var authDb = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
-        var authPendingMigration = await authDb.Database.GetPendingMigrationsAsync();
-
-        if (authPendingMigration.Any())
-            await authDb.Database.MigrateAsync();
-
-
+        
         var companyDb = scope.ServiceProvider.GetRequiredService<CompanyDbContext>();
         var companyPendingMigration = await companyDb.Database.GetPendingMigrationsAsync();
 

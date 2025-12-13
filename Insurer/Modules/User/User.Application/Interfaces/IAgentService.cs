@@ -3,7 +3,7 @@ using User.Application.Models;
 using User.Application.Models.Responses;
 using User.Application.Services;
 
-namespace User.Application.Contracts;
+namespace User.Application.Interfaces;
 
 public interface IAgentService
 {

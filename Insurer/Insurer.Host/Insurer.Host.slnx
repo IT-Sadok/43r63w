@@ -1,16 +1,13 @@
 <Solution>
   <Folder Name="/Modules/" />
-  <Folder Name="/Modules/Auth/">
-    <Project Path="..\Modules\Auth\Auth.Bootstrapper\Auth.Bootstrapper.csproj" />
-    <Project Path="..\Modules\Auth\Auth.Application\Auth.Application.csproj" />
-    <Project Path="..\Modules\Auth\Auth.Domain\Auth.Domain.csproj" />
-    <Project Path="..\Modules\Auth\Auth.Infrastructure\Auth.Infrastructure.csproj" />
-  </Folder>
   <Folder Name="/Modules/Company/">
     <Project Path="../Modules/Company/Company.Application/Company.Application.csproj" />
     <Project Path="../Modules/Company/Company.Bootstrapper/Company.Bootstrapper.csproj" />
     <Project Path="../Modules/Company/Company.Domain/Company.Domain.csproj" />
     <Project Path="../Modules/Company/Company.Infrastructure/Company.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/Modules/Notification/">
+    <Project Path="../Modules/Notification/Notification.Domain/Notification.Domain.csproj" />
   </Folder>
   <Folder Name="/Modules/Policy/">
     <Project Path="../Modules/Policy/Policy.Application/Policy.Application.csproj" />

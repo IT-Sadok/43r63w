@@ -11,7 +11,7 @@ public static class UserModuleInstaller
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddUserApplication();
+        services.AddUserApplication(configuration);
         services.AddUserInfrastructure(configuration);
         return services;
     }

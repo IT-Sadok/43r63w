@@ -1,15 +1,14 @@
-﻿using Auth.Application.Dtos;
-using Auth.Application.Interfaces;
-using Auth.Domain.Enums;
-using FluentValidation;
+﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Shared.Errors;
 using Shared.Results;
-using User.Application.Contracts;
+using User.Application.Interfaces;
 using User.Application.Mapper;
 using User.Application.Models;
+using User.Application.Models.Auth;
 using User.Application.Models.Responses;
 using User.Domain.Entity;
+using User.Domain.Enums;
 using User.Domain.ValueObject;
 using User.Infrastructure.Data;
 

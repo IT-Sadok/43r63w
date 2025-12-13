@@ -7,13 +7,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Auth\Auth.Application\Auth.Application.csproj" />
       <ProjectReference Include="..\..\Policy\Policy.Infrastructure\Policy.Infrastructure.csproj" />
       <ProjectReference Include="..\User.Infrastructure\User.Infrastructure.csproj" />
     </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.0" />
+      <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.11" />
     </ItemGroup>
 
 </Project>

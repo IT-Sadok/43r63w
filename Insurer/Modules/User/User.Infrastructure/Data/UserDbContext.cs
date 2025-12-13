@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using User.Domain;
 using User.Domain.Entity;
 
 namespace User.Infrastructure.Data;
 
 public class UserDbContext(DbContextOptions<UserDbContext> options)
-    : DbContext(options)
+    :  IdentityDbContext<ApplicationUser,ApplicationRole,int>(options)
 {
     public DbSet<Customer> Customers { get; set; }
     

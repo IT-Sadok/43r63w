@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Results;
-using User.Application.Contracts;
+using User.Application.Interfaces;
 using User.Application.Models;
 
 namespace Insurer.Host.Endpoints;

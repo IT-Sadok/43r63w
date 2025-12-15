@@ -1,7 +1,7 @@
-﻿using Auth.Application.Dtos;
-using Auth.Application.Interfaces;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Shared.ContextAccessor;
+using User.Application.Interfaces;
+using User.Application.Models.Auth;
 
 namespace Insurer.Host.Endpoints;
 

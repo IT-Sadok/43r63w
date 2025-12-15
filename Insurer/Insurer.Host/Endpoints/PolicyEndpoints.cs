@@ -11,7 +11,7 @@ public static class PolicyEndpoints
 {
     public static void MapPolicyEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/policies").RequireAuthorization();
+        var group = app.MapGroup("/policies");
         group.MapPost("", CreatePolicyAsync);
         group.MapGet("/{id:int}", GetPolicyAsync);
         group.MapGet("", GetPoliciesAsync);

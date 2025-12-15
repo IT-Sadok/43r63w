@@ -27,9 +27,22 @@
     ports:
       - "1433:1433"
     volumes:
-      - mssql_data:/var/opt/mssql          
-
-  
+      - mssql_data:/var/opt/mssql       
+      
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    hostname: rabbitmq
+    ports:
+      - "5672:5672"    # AMQP
+      - "15672:15672"  # UI
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin123
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    
 volumes:
   minio_data:
   mssql_data:
+  rabbitmq_data:

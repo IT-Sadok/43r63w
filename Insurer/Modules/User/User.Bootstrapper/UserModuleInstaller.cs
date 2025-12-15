@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using User.Application;
 using User.Infrastructure;
 
@@ -9,9 +10,10 @@ public static class UserModuleInstaller
 {
     public static IServiceCollection AddUserModule(
         this IServiceCollection services,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        IHostEnvironment environment)
     {
-        services.AddUserApplication(configuration);
+        services.AddUserApplication(configuration, environment);
         services.AddUserInfrastructure(configuration);
         return services;
     }

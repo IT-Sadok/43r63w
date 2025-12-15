@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using User.Domain.Entity;
 using User.Infrastructure.Data;
 
 namespace User.Infrastructure;
@@ -12,7 +13,11 @@ public static class DependencyInjection
         IConfiguration configuration)
     {
         services.AddDbContext<UserDbContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")))
+            .AddIdentityCore<ApplicationUser>()
+            .AddRoles<ApplicationRole>()
+            .AddEntityFrameworkStores<UserDbContext>();
+        
         return services;
     }
 }

@@ -1,13 +1,16 @@
-﻿using FluentValidation;
+﻿using System.Text;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Policy.Application.Dtos;
 using Policy.Application.Dtos.Responses;
+using Policy.Application.Events;
 using Policy.Application.FilterExstension;
 using Policy.Application.Mapping;
 using Policy.Application.Placeholders;
 using Policy.Domain.Entities;
 using Policy.Domain.Enums;
 using Policy.Infrastructure.Data;
+using Policy.Infrastructure.Interfaces;
 using Shared.Errors;
 using Shared.Pagination;
 using Shared.Results;
@@ -18,7 +21,8 @@ namespace Policy.Application.Services;
 internal sealed class PolicyService(
     IValidator<CreatePolicyModel> createPolicyModelValidator,
     IValidator<PolicyUpdateModel> updatePolicyModelValidator,
-    PolicyDbContext policyDbContext) : IPolicyService
+    PolicyDbContext policyDbContext,
+    IEventPublisher publisher) : IPolicyService
 {
     public async Task<Result<PaginationResponse<PolicyModel>>> GetPoliciesAsync(
         PolicyFilter request,
@@ -99,6 +103,8 @@ internal sealed class PolicyService(
             [
                 new PolicyHistory
                 {
+                    NewValue = "PolicyCreated",
+                    OldValue = "PolicyCreated",
                     ChangeDate = DateTime.Now,
                     ChangedBy = IdPlaceholder.Author,
                     ChangeType = ChangeType.PolicyCreated
@@ -111,6 +117,22 @@ internal sealed class PolicyService(
         policyDbContext.Add(policy);
         await policyDbContext.SaveChangesAsync(cancellationToken);
 
+        if (policy.Id > 0)
+        {
+            var @event = new PolicyCreatedEvent
+            {
+                UserId = IdPlaceholder.CustomerId.ToString(),
+                PolicyId = policy.Id.ToString(),
+                PolicyNumber = policy.PolicyNumber,
+                Price = policy.PremiumAmount,
+                StartDate = policy.StartDate,
+                EndDate = policy.EndDate
+            };
+
+            var body = Encoding.UTF8.GetBytes(@event.ToString()!);
+            await publisher.PublishAsync(body,"policy-create");
+        }
+        
         return Result<CreatePolicyResponse>.Success(new CreatePolicyResponse
         {
             Success = true

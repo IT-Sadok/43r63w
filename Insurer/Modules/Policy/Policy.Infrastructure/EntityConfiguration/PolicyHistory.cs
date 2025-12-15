@@ -5,11 +5,12 @@ internal class PolicyHistory : IEntityTypeConfiguration<Policy.Domain.Entities.P
     public void Configure(EntityTypeBuilder<Domain.Entities.PolicyHistory> builder)
     {
         builder.HasKey(pk => pk.Id);
-
-
-        builder.HasOne<Domain.Entities.Policy>()
+        
+        
+        builder
+            .HasOne(h => h.Policy)
             .WithMany(p => p.PolicyHistories)
-            .HasForeignKey(fk => fk.PolicyId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .HasForeignKey(h => h.PolicyId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

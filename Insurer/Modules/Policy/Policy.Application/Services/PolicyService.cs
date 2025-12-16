@@ -128,9 +128,7 @@ internal sealed class PolicyService(
                 StartDate = policy.StartDate,
                 EndDate = policy.EndDate
             };
-
-            var body = Encoding.UTF8.GetBytes(@event.ToString()!);
-            await publisher.PublishAsync(body,"policy-create");
+            await publisher.PublishAsync(@event,"policy-create");
         }
         
         return Result<CreatePolicyResponse>.Success(new CreatePolicyResponse

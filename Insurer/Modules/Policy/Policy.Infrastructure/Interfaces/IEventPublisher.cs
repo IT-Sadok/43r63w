@@ -1,6 +1,8 @@
-﻿namespace Policy.Infrastructure.Interfaces;
+﻿using Shared;
+
+namespace Policy.Infrastructure.Interfaces;
 
 public interface IEventPublisher
 {
-    Task PublishAsync(byte[] body, string queueName);
+    Task PublishAsync(BaseEvent @event, string queueName);
 }

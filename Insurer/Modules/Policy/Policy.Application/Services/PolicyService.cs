@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Policy.Application.Dtos;
 using Policy.Application.Dtos.Responses;
 using Policy.Application.Events;
@@ -11,6 +12,7 @@ using Policy.Domain.Entities;
 using Policy.Domain.Enums;
 using Policy.Infrastructure.Data;
 using Policy.Infrastructure.Interfaces;
+using Policy.Infrastructure.Messaging;
 using Shared.Errors;
 using Shared.Pagination;
 using Shared.Results;
@@ -22,8 +24,11 @@ internal sealed class PolicyService(
     IValidator<CreatePolicyModel> createPolicyModelValidator,
     IValidator<PolicyUpdateModel> updatePolicyModelValidator,
     PolicyDbContext policyDbContext,
-    IEventPublisher publisher) : IPolicyService
+    IEventPublisher publisher,
+    IOptions<RabbitMqQueue> rabbitMqOptions) : IPolicyService
 {
+    private readonly RabbitMqQueue _rabbitMqQueue = rabbitMqOptions.Value;
+
     public async Task<Result<PaginationResponse<PolicyModel>>> GetPoliciesAsync(
         PolicyFilter request,
         SortParams sortParams,
@@ -128,9 +133,9 @@ internal sealed class PolicyService(
                 StartDate = policy.StartDate,
                 EndDate = policy.EndDate
             };
-            await publisher.PublishAsync(@event,"policy-create");
+            await publisher.PublishAsync(@event, _rabbitMqQueue.PolicyCreated);
         }
-        
+
         return Result<CreatePolicyResponse>.Success(new CreatePolicyResponse
         {
             Success = true

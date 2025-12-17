@@ -17,7 +17,6 @@ public static class DependencyInjection
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
         services.Configure<RabbitMqOptions>(configuration.GetSection("RabbitMq"));
-
         services.AddSingleton<IConnection>(sp =>
         {
             var rabbitMqOptions = sp.GetRequiredService<IOptions<RabbitMqOptions>>().Value;

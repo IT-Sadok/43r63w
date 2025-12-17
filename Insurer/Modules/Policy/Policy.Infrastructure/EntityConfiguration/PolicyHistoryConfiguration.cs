@@ -1,11 +1,10 @@
 ﻿namespace Policy.Infrastructure.EntityConfiguration;
 
-internal class PolicyHistory : IEntityTypeConfiguration<Policy.Domain.Entities.PolicyHistory>
+internal class PolicyHistoryConfiguration : IEntityTypeConfiguration<Policy.Domain.Entities.PolicyHistory>
 {
     public void Configure(EntityTypeBuilder<Domain.Entities.PolicyHistory> builder)
     {
         builder.HasKey(pk => pk.Id);
-        
         
         builder
             .HasOne(h => h.Policy)

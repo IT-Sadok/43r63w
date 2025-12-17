@@ -12,7 +12,7 @@ public static class PolicyModule
         IConfiguration configuration)
     {
         services.AddPolicyInfrastructure(configuration);
-        services.AddPolicyApplication();
+        services.AddPolicyApplication(configuration);
         return services;
     }
 

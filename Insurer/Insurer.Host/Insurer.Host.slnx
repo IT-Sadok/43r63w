@@ -7,7 +7,7 @@
     <Project Path="../Modules/Company/Company.Infrastructure/Company.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/Modules/Notification/">
-    <Project Path="../Modules/Notification/Notification.Domain/Notification.Domain.csproj" />
+    <Project Path="../Modules/Notification/Notification.Api/Notification.Api.csproj" />
   </Folder>
   <Folder Name="/Modules/Policy/">
     <Project Path="../Modules/Policy/Policy.Application/Policy.Application.csproj" />

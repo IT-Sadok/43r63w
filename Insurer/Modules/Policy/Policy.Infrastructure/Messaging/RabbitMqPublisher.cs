@@ -8,16 +8,17 @@ namespace Policy.Infrastructure.Messaging;
 
 public class RabbitMqPublisher(IConnection connection) : IEventPublisher
 {
-    public async Task PublishAsync(BaseEvent @event, string queueName)
+    public async Task PublishAsync<T>(T @event, string queueName,CancellationToken cancellationToken)
     {
-        var channel = await connection.CreateChannelAsync();
+        var channel = await connection.CreateChannelAsync(cancellationToken: cancellationToken);
 
         await channel.QueueDeclareAsync(
             queue: queueName,
             durable: true,
             autoDelete: false,
             exclusive: false,
-            arguments: null);
+            arguments: null, 
+            cancellationToken: cancellationToken);
 
         var json = JsonSerializer.Serialize(@event);
         var body = Encoding.UTF8.GetBytes(json);
@@ -25,6 +26,7 @@ public class RabbitMqPublisher(IConnection connection) : IEventPublisher
         await channel.BasicPublishAsync(
             exchange: string.Empty,
             routingKey: queueName,
-            body: body);
+            body: body, 
+            cancellationToken: cancellationToken);
     }
 }

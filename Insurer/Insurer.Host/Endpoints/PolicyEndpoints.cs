@@ -18,7 +18,7 @@ public static class PolicyEndpoints
         group.MapPut("", UpdatePolicyAsync);
         group.MapDelete("/{id:int}", DeletePolicyAsync);
     }
-    
+
     private static async Task<IResult> CreatePolicyAsync(
         CreatePolicyModel model,
         [FromServices] IPolicyService policyService,
@@ -36,7 +36,7 @@ public static class PolicyEndpoints
         var result = await policyService.CreatePolicyAsync(model, cancellationToken);
 
         return result.IsSuccess
-            ? Results.CreatedAtRoute()
+            ? Results.NoContent()
             : Results.BadRequest(result.Errors);
     }
 
@@ -69,6 +69,7 @@ public static class PolicyEndpoints
         CancellationToken cancellationToken = default)
     {
         var user = userContext.GetUserContext();
+        model.UserId = user.UserId!;
         model.UserName = user.UserName!;
         var result = await policyService.UpdatePolicyAsync(model, cancellationToken);
         return result.IsSuccess

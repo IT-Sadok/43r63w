@@ -4,5 +4,5 @@ namespace Policy.Infrastructure.Interfaces;
 
 public interface IEventPublisher
 {
-    Task PublishAsync(BaseEvent @event, string queueName);
+    Task PublishAsync<T>(T @event, string queueName, CancellationToken cancellationToken);
 }

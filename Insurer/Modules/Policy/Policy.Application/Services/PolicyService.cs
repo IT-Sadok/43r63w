@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Policy.Application.Dtos;
 using Policy.Application.Dtos.Responses;
-using Policy.Application.Events;
 using Policy.Application.FilterExstension;
 using Policy.Application.Mapping;
 using Policy.Application.Placeholders;
@@ -13,7 +12,9 @@ using Policy.Domain.Enums;
 using Policy.Infrastructure.Data;
 using Policy.Infrastructure.Interfaces;
 using Policy.Infrastructure.Messaging;
+using Shared;
 using Shared.Errors;
+using Shared.Events;
 using Shared.Pagination;
 using Shared.Results;
 using Shared.Sorted;
@@ -133,7 +134,7 @@ internal sealed class PolicyService(
                 StartDate = policy.StartDate,
                 EndDate = policy.EndDate
             };
-            await publisher.PublishAsync(@event, _rabbitMqQueue.PolicyCreated);
+            await publisher.PublishAsync(@event, _rabbitMqQueue.PolicyCreated, cancellationToken);
         }
 
         return Result<CreatePolicyResponse>.Success(new CreatePolicyResponse
@@ -172,6 +173,18 @@ internal sealed class PolicyService(
             .ExecuteUpdateAsync(up => up
                 .SetProperty(p => p.Status, _ => model.PolicyStatus), cancellationToken);
 
+        if (affected > 0)
+        {
+            var @event = new PolicyUpdatedEvent
+            {
+                UserId = model.UserId,
+                PolicyId = model.PolicyId.ToString(),
+                Status = model.PolicyStatus.ToString()
+            };
+
+            await publisher.PublishAsync(@event, _rabbitMqQueue.PolicyUpdated, cancellationToken);
+        }
+        
         return affected == 0
             ? Result<UpdatePolicyResponse>.Failure("Something went wrong,try again")
             : Result<UpdatePolicyResponse>.Success(new UpdatePolicyResponse

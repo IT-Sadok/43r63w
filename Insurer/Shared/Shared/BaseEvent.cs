@@ -1,10 +1,10 @@
 ﻿namespace Shared;
 
-public abstract class BaseEvent
+public class BaseEvent
 {
-    public Guid EventId { get; } = Guid.NewGuid();
+    public Guid EventId { get; set; } = Guid.NewGuid();
 
-    public DateTime OccuredAt { get;} = DateTime.Now;
+    public DateTime OccuredAt { get; set; } = DateTime.Now;
 
-    public string EventType => GetType().Name;
+    public string EventType { get; set; } = null!;
 };

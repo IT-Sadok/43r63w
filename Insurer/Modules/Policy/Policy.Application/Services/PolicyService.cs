@@ -1,4 +1,4 @@
-﻿using System.Text;
+﻿using System.Text.Json;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -10,9 +10,7 @@ using Policy.Application.Placeholders;
 using Policy.Domain.Entities;
 using Policy.Domain.Enums;
 using Policy.Infrastructure.Data;
-using Policy.Infrastructure.Interfaces;
 using Policy.Infrastructure.Messaging;
-using Shared;
 using Shared.Errors;
 using Shared.Events;
 using Shared.Pagination;
@@ -25,7 +23,6 @@ internal sealed class PolicyService(
     IValidator<CreatePolicyModel> createPolicyModelValidator,
     IValidator<PolicyUpdateModel> updatePolicyModelValidator,
     PolicyDbContext policyDbContext,
-    IEventPublisher publisher,
     IOptions<RabbitMqQueue> rabbitMqOptions) : IPolicyService
 {
     private readonly RabbitMqQueue _rabbitMqQueue = rabbitMqOptions.Value;
@@ -70,7 +67,7 @@ internal sealed class PolicyService(
 
         var policyModel = policy.ToModel();
 
-        return Result<PolicyModel>.Success(policyModel!);
+        return Result<PolicyModel>.Success(policyModel);
     }
 
     public async Task<Result<CreatePolicyResponse>> CreatePolicyAsync(
@@ -82,6 +79,9 @@ internal sealed class PolicyService(
             return Result<CreatePolicyResponse>.Failure(
                 errorMessage: ErrorsMessage.ValidationError,
                 errors: validate.Errors.ToDictionary(k => k.PropertyName, v => v.ErrorMessage));
+
+
+        await using var transaction = await policyDbContext.Database.BeginTransactionAsync(cancellationToken);
 
         var policy = new Policy.Domain.Entities.Policy
         {
@@ -120,22 +120,30 @@ internal sealed class PolicyService(
 
         policy.Status = PolicyStatus.Active;
 
-        policyDbContext.Add(policy);
         await policyDbContext.SaveChangesAsync(cancellationToken);
 
-        if (policy.Id > 0)
+        var @event = new PolicyCreatedEvent
         {
-            var @event = new PolicyCreatedEvent
-            {
-                UserId = IdPlaceholder.CustomerId.ToString(),
-                PolicyId = policy.Id.ToString(),
-                PolicyNumber = policy.PolicyNumber,
-                Price = policy.PremiumAmount,
-                StartDate = policy.StartDate,
-                EndDate = policy.EndDate
-            };
-            await publisher.PublishAsync(@event, _rabbitMqQueue.PolicyCreated, cancellationToken);
-        }
+            UserId = IdPlaceholder.CustomerId.ToString(),
+            PolicyId = policy.Id.ToString(),
+            PolicyNumber = policy.PolicyNumber,
+            Price = policy.PremiumAmount,
+            StartDate = policy.StartDate,
+            EndDate = policy.EndDate
+        };
+
+        var outboxMessage = new OutboxMessage
+        {
+            Type = @event.EventType,
+            QueueName = _rabbitMqQueue.PolicyCreated,
+            Content = JsonSerializer.Serialize(@event),
+            OccurredOn = DateTime.Now,
+        };
+
+        policyDbContext.OutboxMessages.Add(outboxMessage);
+        await policyDbContext.SaveChangesAsync(cancellationToken);
+
+        await transaction.CommitAsync(cancellationToken);
 
         return Result<CreatePolicyResponse>.Success(new CreatePolicyResponse
         {
@@ -172,18 +180,6 @@ internal sealed class PolicyService(
                         && e.UserPayments.Any())
             .ExecuteUpdateAsync(up => up
                 .SetProperty(p => p.Status, _ => model.PolicyStatus), cancellationToken);
-
-        if (affected > 0)
-        {
-            var @event = new PolicyUpdatedEvent
-            {
-                UserId = model.UserId,
-                PolicyId = model.PolicyId.ToString(),
-                Status = model.PolicyStatus.ToString()
-            };
-
-            await publisher.PublishAsync(@event, _rabbitMqQueue.PolicyUpdated, cancellationToken);
-        }
         
         return affected == 0
             ? Result<UpdatePolicyResponse>.Failure("Something went wrong,try again")

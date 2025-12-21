@@ -21,6 +21,8 @@ public class PolicyDbContext : DbContext
 
     public DbSet<CompanyPayment> CompanyPayments { get; set; }
     
+    public DbSet<OutboxMessage> OutboxMessages { get; set; }
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

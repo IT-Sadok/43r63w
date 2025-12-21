@@ -34,24 +34,22 @@ public class RabbitMqConsumer(
         {
             try
             {
-                var message = Encoding.UTF8.GetString(ea.Body.ToArray());
-
-                var baseEvent = JsonSerializer.Deserialize<BaseEvent>(message);
-                
-                logger.LogInformation(baseEvent.EventType);
-
-                if (baseEvent == null)
+                if (ea.BasicProperties?.Headers == null ||
+                    !ea.BasicProperties.Headers.TryGetValue("eventType", out var rawType))
                 {
-                    logger.LogWarning("Base event is null");
+                    logger.LogError("Missing eventType header");
                     return;
                 }
-
+                
+                var eventType = rawType!.ToString();
+                var message = Encoding.UTF8.GetString(ea.Body.ToArray());
+                
                 using var scope = serviceProvider.CreateScope();
 
                 var handlers = scope.ServiceProvider.GetRequiredService<IEnumerable<IEventHandler>>();
 
                 var handler = handlers
-                    .FirstOrDefault(h => h.EventType == baseEvent?.EventType);
+                    .FirstOrDefault(h => h.EventType == eventType);
 
                 if (handler == null)
                 {

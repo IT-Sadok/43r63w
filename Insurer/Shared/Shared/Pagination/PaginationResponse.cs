@@ -2,30 +2,21 @@
 
 namespace Shared.Pagination;
 
-public sealed class PaginationResponse<T>
+public sealed class PaginationResponse<T>(
+    int pageSize,
+    int page,
+    int totalCount,
+    int totalPages,
+    List<T> items)
 {
-    public PaginationResponse(
-        int pageSize,
-        int page,
-        int totalCount,
-        int totalPages,
-        List<T> items)
-    {
-        PageSize = pageSize;
-        Page = page;
-        TotalCount = totalCount;
-        TotalPages = totalPages;
-        Items = items;
-    }
+    public int PageSize { get; set; } = pageSize;
 
-    public int PageSize { get; set; }
+    public int Page { get; set; } = page;
 
-    public int Page { get; set; }
+    public int TotalCount { get; set; } = totalCount;
 
-    public int TotalCount { get; set; }
+    public int TotalPages { get; set; } = totalPages;
 
-    public int TotalPages { get; set; }
-
-    public List<T> Items { get; set; }
+    public List<T> Items { get; set; } = items;
 }
 

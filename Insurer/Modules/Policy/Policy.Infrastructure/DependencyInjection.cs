@@ -2,6 +2,7 @@
 using Policy.Infrastructure.Data;
 using Policy.Infrastructure.Interfaces;
 using Policy.Infrastructure.Messaging;
+using Policy.Infrastructure.Options;
 using RabbitMQ.Client;
 
 
@@ -17,6 +18,15 @@ public static class DependencyInjection
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
         services.Configure<RabbitMqOptions>(configuration.GetSection("RabbitMq"));
+        services.Configure<EventRoutingOptions>(routingOptions =>
+        {
+            routingOptions.Routes = configuration
+                .GetSection("EventRouting")
+                .Get<Dictionary<string, string>>()!;
+        });
+
+        services.AddScoped<EventRouting>();
+
         services.AddSingleton<IConnection>(sp =>
         {
             var rabbitMqOptions = sp.GetRequiredService<IOptions<RabbitMqOptions>>().Value;
@@ -33,9 +43,9 @@ public static class DependencyInjection
                 .GetAwaiter()
                 .GetResult();
         });
-        
-        services.AddScoped<IEventPublisher,RabbitMqPublisher>();
-        
+
+        services.AddScoped<IEventPublisher, RabbitMqPublisher>();
+
         return services;
     }
 }

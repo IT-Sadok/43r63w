@@ -1,4 +1,6 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Notification.Api.Data;
 using Notification.Api.EventsHandler;
 using Notification.Api.Interfaces;
 using Notification.Api.Messaging;
@@ -12,6 +14,11 @@ builder.Services.Configure<RabbitMqQueue>(builder.Configuration.GetSection("Rabb
 
 builder.Services.AddScoped<IEventHandler, PolicyCreatedEventHandler>();
 builder.Services.AddScoped<IEventHandler, PolicyUpdatedEventHandler>();
+
+builder.Services.AddDbContext<NotificationDbContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
 
 builder.Services.AddSingleton<IConnection>(sp =>
 {
@@ -37,6 +44,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    await app.ApplyMigrationAsync();
 }
 
 app.UseHttpsRedirection();

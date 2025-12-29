@@ -135,7 +135,6 @@ internal sealed class PolicyService(
         var outboxMessage = new OutboxMessage
         {
             Type = @event.EventType,
-            QueueName = _rabbitMqQueue.PolicyCreated,
             Content = JsonSerializer.Serialize(@event),
             OccurredOn = DateTime.Now,
         };

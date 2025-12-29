@@ -3,9 +3,6 @@
 public class OutboxMessage
 {
     public int Id { get; set; }
-    
-    public required string QueueName { get; set; }
-
     public required string Type { get; set; }
     
     public required string Content { get; set; }

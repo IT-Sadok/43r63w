@@ -28,7 +28,19 @@
       - "1433:1433"
     volumes:
       - mssql_data:/var/opt/mssql       
-      
+  
+  notification-db:
+    image: mcr.microsoft.com/mssql/server
+    container_name: notification-db
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"
+      SA_PASSWORD: "MyStrongPassw0rd!"
+    ports:
+      - "1434:1433"
+    volumes:
+      - notification_db_data:/var/opt/mssql
+    
   rabbitmq:
     image: rabbitmq:3-management-alpine
     container_name: rabbitmq
@@ -46,3 +58,4 @@ volumes:
   minio_data:
   mssql_data:
   rabbitmq_data:
+  notification_db_data:

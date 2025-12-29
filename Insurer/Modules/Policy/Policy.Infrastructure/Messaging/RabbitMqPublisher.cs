@@ -1,27 +1,41 @@
 ﻿using System.Text;
 using System.Text.Json;
+using Microsoft.Extensions.Options;
 using Policy.Infrastructure.Interfaces;
 using RabbitMQ.Client;
 using Shared;
 
 namespace Policy.Infrastructure.Messaging;
 
-public class RabbitMqPublisher(IConnection connection) : IEventPublisher
+public class RabbitMqPublisher(
+    IConnection connection,
+    EventRouting eventRouting,
+    IOptions<RabbitMqQueue> rabbitMqQueues) : IEventPublisher
 {
-    public async Task PublishAsync(string eventType, string content, string queueName, CancellationToken cancellationToken)
+    private readonly RabbitMqQueue _rabbitMqQueue = rabbitMqQueues.Value;
+
+    public async Task PublishAsync(string eventType, string content, CancellationToken cancellationToken)
     {
         var channel = await connection.CreateChannelAsync(cancellationToken: cancellationToken);
-    
+        
+        var arguments = new Dictionary<string, object?>
+        {
+            ["x-dead-letter-exchange"] = "",
+            ["x-dead-letter-routing-key"] = "policy.created.dlq"
+        };
+
         await channel.QueueDeclareAsync(
-            queue: queueName,
+            queue: _rabbitMqQueue.PolicyCreated,
             durable: true,
-            autoDelete: false,
             exclusive: false,
-            arguments: null, 
+            autoDelete: false,
+            arguments: arguments,
             cancellationToken: cancellationToken);
-        
+
+        var queueName = eventRouting.GetQueueName(eventType);
+
         var body = Encoding.UTF8.GetBytes(content);
-        
+
         var props = new BasicProperties
         {
             Headers = new Dictionary<string, object>
@@ -29,13 +43,13 @@ public class RabbitMqPublisher(IConnection connection) : IEventPublisher
                 ["eventType"] = eventType,
             }!
         };
-    
+
         await channel.BasicPublishAsync(
             exchange: string.Empty,
             routingKey: queueName,
             mandatory: false,
             basicProperties: props,
-            body: body, 
+            body: body,
             cancellationToken: cancellationToken);
     }
 }

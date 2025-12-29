@@ -1,36 +1,37 @@
-﻿using System.Reflection;
-using System.Text.Json;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Policy.Domain.Entities;
+using Microsoft.Extensions.Options;
+using Policy.Application.Options;
 using Policy.Infrastructure.Data;
 using Policy.Infrastructure.Interfaces;
 
 namespace Policy.Application.Services;
 
-public class OutboxPublisherService(
-    IEventPublisher publisher,
+public class OutboxProcessor(
     IServiceProvider serviceProvider,
-    ILogger<OutboxPublisherService> logger) : BackgroundService
+    ILogger<OutboxProcessor> logger,
+    IOptions<OutboxProcessorOptions> options) : BackgroundService
 {
-    private const int BatchSize = 20;
+    private readonly OutboxProcessorOptions _outboxProcessorOptions = options.Value;
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            logger.LogInformation("Starting OutboxPublisherService processing");
+            logger.LogInformation("Starting OutboxProcessor processing");
 
             using var scope = serviceProvider.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<PolicyDbContext>();
 
             var messages = await db.OutboxMessages
-                .Where(m => m.ProcessedOn == null)
+                .Where(m => m.ProcessedOn == null || m.Error != null)
                 .OrderBy(a => a.OccurredOn)
-                .Take(BatchSize)
+                .Take(_outboxProcessorOptions.BatchSize)
                 .ToListAsync(cancellationToken: stoppingToken);
+            
+            var publisher = scope.ServiceProvider.GetRequiredService<IEventPublisher>();
 
             foreach (var message in messages)
             {
@@ -39,11 +40,13 @@ public class OutboxPublisherService(
                     await publisher.PublishAsync(
                         message.Type,
                         message.Content,
-                        message.QueueName,
                         stoppingToken);
                     
-                    await db.OutboxMessages.ExecuteUpdateAsync(a =>
-                            a.SetProperty(e => e.ProcessedOn, DateTime.Now),
+                    await db.OutboxMessages
+                        .Where(e => e.Id == message.Id)
+                        .ExecuteUpdateAsync(a =>
+                            a.SetProperty(e => e.ProcessedOn, DateTime.Now)
+                                .SetProperty(e => e.Error, (string?)null),
                         cancellationToken: stoppingToken);
                 }
                 catch (Exception ex)

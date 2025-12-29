@@ -1,4 +1,4 @@
-﻿namespace Policy.Infrastructure.Messaging;
+﻿namespace Policy.Infrastructure.Options;
 
 public class RabbitMqOptions
 {
@@ -11,4 +11,6 @@ public class RabbitMqOptions
     public string UserName { get; set; } = null!;
 
     public string Password { get; set; } = null!;
+
+    public string RetryCount { get; set; } = null!;
 }

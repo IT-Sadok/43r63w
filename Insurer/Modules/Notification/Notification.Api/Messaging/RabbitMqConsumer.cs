@@ -32,58 +32,61 @@ public class RabbitMqConsumer(
             {
                 try
                 {
-                    if (ea.BasicProperties?.Headers == null ||
-                        !ea.BasicProperties.Headers.TryGetValue("eventType", out var rawType))
+                    while (!stoppingToken.IsCancellationRequested)
                     {
-                        logger.LogError("Missing eventType header");
-                        return;
-                    }
+                        if (ea.BasicProperties?.Headers == null ||
+                            !ea.BasicProperties.Headers.TryGetValue("eventType", out var rawType))
+                        {
+                            logger.LogError("Missing eventType header");
+                            return;
+                        }
 
-                    var eventType = Encoding.UTF8.GetString((byte[])rawType!);
-                    var message = Encoding.UTF8.GetString(ea.Body.ToArray());
-                    var baseEvent = JsonSerializer.Deserialize<BaseEvent>(message);
+                        var eventType = Encoding.UTF8.GetString((byte[])rawType!);
+                        var message = Encoding.UTF8.GetString(ea.Body.ToArray());
+                        var baseEvent = JsonSerializer.Deserialize<BaseEvent>(message);
 
-                    using var scope = serviceProvider.CreateScope();
-                    var db = scope.ServiceProvider.GetRequiredService<NotificationDbContext>();
+                        using var scope = serviceProvider.CreateScope();
+                        var db = scope.ServiceProvider.GetRequiredService<NotificationDbContext>();
 
-                    if (await db.ProcessedEvents.AnyAsync(e => e.EventId == baseEvent!.EventId, stoppingToken))
-                    {
-                        logger.LogInformation($"Event {baseEvent!.EventId} already processed");
+                        if (await db.ProcessedEvents.AnyAsync(e => e.EventId == baseEvent!.EventId, stoppingToken))
+                        {
+                            logger.LogInformation($"Event {baseEvent!.EventId} already processed");
 
-                        await _channel.BasicAckAsync(ea.DeliveryTag, false, stoppingToken);
-                        return;
-                    }
+                            await _channel.BasicAckAsync(ea.DeliveryTag, false, stoppingToken);
+                            return;
+                        }
 
-                    var handlers = scope.ServiceProvider.GetRequiredService<IEnumerable<IEventHandler>>();
+                        var handlers = scope.ServiceProvider.GetRequiredService<IEnumerable<IEventHandler>>();
 
-                    var handler = handlers
-                        .FirstOrDefault(h => h.EventType == eventType);
+                        var handler = handlers
+                            .FirstOrDefault(h => h.EventType == eventType);
 
-                    if (handler == null)
-                    {
-                        logger.LogError("Handler not found");
+                        if (handler == null)
+                        {
+                            logger.LogError("Handler not found");
+                            await _channel.BasicAckAsync(ea.DeliveryTag, false);
+                            return;
+                        }
+
+                        await handler.HandleAsync(message, stoppingToken);
+
+                        var processedEvent = new ProcessedEvent
+                        {
+                            EventId = baseEvent!.EventId,
+                            ProcessedAt = DateTime.UtcNow,
+                        };
+
+                        db.ProcessedEvents.Add(processedEvent);
+                        await db.SaveChangesAsync(stoppingToken);
+
                         await _channel.BasicAckAsync(ea.DeliveryTag, false);
-                        return;
                     }
-
-                    await handler.HandleAsync(message, stoppingToken);
-
-                    var processedEvent = new ProcessedEvent
-                    {
-                        EventId = baseEvent!.EventId,
-                        ProcessedAt = DateTime.UtcNow,
-                    };
-
-                    db.ProcessedEvents.Add(processedEvent);
-                    await db.SaveChangesAsync(stoppingToken);
-
-                    await _channel.BasicAckAsync(ea.DeliveryTag, false);
                 }
                 catch (Exception e)
                 {
                     logger.LogError(e, "Message processing error");
 
-                    var retryCount = RetryCount(ea);
+                    var retryCount = GetRetryCount(ea);
 
                     if (retryCount >= _queueOptions.MaxRetryCount)
                     {
@@ -102,8 +105,6 @@ public class RabbitMqConsumer(
                 consumer: consumer,
                 cancellationToken: stoppingToken
             );
-
-            await Task.Delay(Timeout.Infinite, stoppingToken);
         }
         catch (OperationCanceledException ex)
         {
@@ -111,7 +112,7 @@ public class RabbitMqConsumer(
         }
     }
 
-    private int RetryCount(BasicDeliverEventArgs ea)
+    private int GetRetryCount(BasicDeliverEventArgs ea)
     {
         if (ea.BasicProperties?.Headers == null)
             return 0;
@@ -134,7 +135,7 @@ public class RabbitMqConsumer(
                 : new Dictionary<string, object>())!,
         };
 
-        props.Headers["x-retry-count"] = retryCount + 1;
+        props.Headers[SC.RetryCount] = retryCount + 1;
 
         await channel.BasicPublishAsync(
             exchange: string.Empty,

@@ -1,9 +1,12 @@
+using Mailjet.Client;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Notification.Api.Data;
 using Notification.Api.EventsHandler;
+using Notification.Api.Infrastructure;
 using Notification.Api.Interfaces;
 using Notification.Api.Messaging;
+using Notification.Api.Options;
 using RabbitMQ.Client;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,9 +18,21 @@ builder.Services.Configure<RabbitMqQueue>(builder.Configuration.GetSection("Rabb
 builder.Services.AddScoped<IEventHandler, PolicyCreatedEventHandler>();
 builder.Services.AddScoped<IEventHandler, PolicyUpdatedEventHandler>();
 
+
+builder.Services.AddScoped<IEmailSender, SendEmailMailjet>();
+
+
 builder.Services.AddDbContext<NotificationDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
+
+builder.Services.AddHttpClient<IMailjetClient, MailjetClient>((sp, client) =>
+{
+    var mailjetOptions = sp.GetRequiredService<IOptions<MailjetOptions>>().Value;
+
+    client.SetDefaultSettings();
+    client.UseBasicAuthentication(mailjetOptions.PublicKey, mailjetOptions.PrivateKey);
 });
 
 builder.Services.AddSingleton<IConnection>(sp =>

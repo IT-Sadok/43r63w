@@ -2,13 +2,14 @@
 using Microsoft.EntityFrameworkCore;
 using Notification.Api.Data;
 using Notification.Api.Interfaces;
+using Notification.Api.Models;
 using Shared.Events;
 
 namespace Notification.Api.EventsHandler;
 
 public sealed class PolicyCreatedEventHandler(
     ILogger<PolicyCreatedEventHandler> logger,
-    NotificationDbContext dbContext) : IEventHandler
+    IEmailSender emailService) : IEventHandler
 {
     public string EventType => SC.PolicyCreatedEvent;
 
@@ -16,9 +17,12 @@ public sealed class PolicyCreatedEventHandler(
     {
         var @event = JsonSerializer.Deserialize<PolicyCreatedEvent>(message);
 
-        if (@event == null)
-            throw new ArgumentNullException("Event is null");
-        
+        ArgumentNullException.ThrowIfNull(@event);
+
+        var model = new SendEmailModel(@event.Email, "Policy has been succefully created", "Policy Created");
+
+        var response = await emailService.SendEmailAsync(model, cancellationToken);
+
         logger.LogInformation($"Policy successfuly created with number of : {@event!.PolicyNumber}");
     }
 }

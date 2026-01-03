@@ -1,6 +1,3 @@
 ﻿namespace Notification.Api.Models;
 
-public class SendEmailModel
-{
-    
-}
+public sealed record SendEmailModel(string To, string Body, string Title);

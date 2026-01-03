@@ -1,4 +1,6 @@
-﻿namespace Shared.Events;
+﻿using System.Security.AccessControl;
+
+namespace Shared.Events;
 
 public sealed class PolicyCreatedEvent : BaseEvent
 {
@@ -6,6 +8,9 @@ public sealed class PolicyCreatedEvent : BaseEvent
     {
         EventType = nameof(PolicyCreatedEvent);
     }
+
+
+    public string Email { get; set; } = null!;
 
     public string UserId { get; set; } = null!;
 

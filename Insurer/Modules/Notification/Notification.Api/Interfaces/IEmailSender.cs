@@ -8,7 +8,3 @@ public interface IEmailSender
         SendEmailModel model,
         CancellationToken cancellationToken = default);
 }
-
-
-
-public sealed record SendEmailResponseModel(bool IsSuccess, string? Message = null);

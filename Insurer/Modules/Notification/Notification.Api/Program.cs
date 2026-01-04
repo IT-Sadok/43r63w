@@ -14,6 +14,7 @@ builder.Services.AddOpenApi();
 
 builder.Services.Configure<RabbitMqOptions>(builder.Configuration.GetSection("RabbitMq"));
 builder.Services.Configure<RabbitMqQueue>(builder.Configuration.GetSection("RabbitMqQueues"));
+builder.Services.Configure<MailjetOptions>(builder.Configuration.GetSection("Mailjet"));
 
 builder.Services.AddScoped<IEventHandler, PolicyCreatedEventHandler>();
 builder.Services.AddScoped<IEventHandler, PolicyUpdatedEventHandler>();

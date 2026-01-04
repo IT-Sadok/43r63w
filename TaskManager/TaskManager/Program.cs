@@ -1,7 +1,4 @@
-﻿using System.Data;
-using System.Threading.Tasks;
-
-namespace TaskManager
+﻿namespace TaskManager
 {
     internal class Program
     {
@@ -16,7 +13,6 @@ namespace TaskManager
             Price = 19.99m,
             Rating = 4.5
         };
-
 
         static async Task Main(string[] args)
         {
@@ -39,6 +35,5 @@ namespace TaskManager
                 _book.Title = $"Sample Book {titleName}";
             }
         }
-
     }
 }

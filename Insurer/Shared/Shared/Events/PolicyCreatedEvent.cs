@@ -1,8 +1,9 @@
 ﻿using System.Security.AccessControl;
+using Shared.InMemoryQueue;
 
 namespace Shared.Events;
 
-public sealed class PolicyCreatedEvent : BaseEvent
+public sealed class PolicyCreatedEvent : BaseEvent,IEvent
 {
     public PolicyCreatedEvent()
     {

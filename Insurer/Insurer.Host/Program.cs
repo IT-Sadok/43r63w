@@ -11,6 +11,7 @@ builder.Services.AddCompanyModule(builder.Configuration, builder.Environment);
 
 builder.Services.AddHostService();
 builder.Services.AddSwagger();
+builder.Services.AddInMemoryEventBus();
 
 var app = builder.Build();
 

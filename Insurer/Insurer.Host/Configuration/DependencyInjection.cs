@@ -1,6 +1,7 @@
 ﻿using Insurer.Host.Utils;
 using Microsoft.OpenApi.Models;
 using Shared.ContextAccessor;
+using Shared.InMemoryQueue;
 
 namespace Insurer.Host.Configuration;
 
@@ -16,6 +17,7 @@ public static class DependencyInjection
         services.AddAntiforgery();
         return services;
     }
+
     public static IServiceCollection AddSwagger(this IServiceCollection services)
     {
         services.AddEndpointsApiExplorer();
@@ -27,7 +29,7 @@ public static class DependencyInjection
                 Title = "Insurer service",
                 Version = "v1",
             });
-            
+
             options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 Name = "Authorization",
@@ -53,6 +55,15 @@ public static class DependencyInjection
                 }
             });
         });
+
+        return services;
+    }
+
+    public static IServiceCollection AddInMemoryEventBus(
+        this IServiceCollection services)
+    {
+        services.AddSingleton<InMemoryEventBus>();
+        services.AddSingleton<IEventBus>(sp => sp.GetRequiredService<InMemoryEventBus>());
         
         return services;
     }

@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Policy.Application.BackgroundService;
 using Policy.Application.Options;
 using Policy.Application.Services;
 using Policy.Application.Validators;
@@ -21,7 +22,7 @@ public static class DependencyInjection
         services.Configure<RabbitMqQueue>(configuration.GetSection("RabbitMqQueues"));
         services.Configure<OutboxProcessorOptions>(configuration.GetSection("OutboxProcessorOptions"));
         
-        services.AddHostedService<OutboxProcessor>();
+        services.AddHostedService<EventDispatcher>();
         
         return services;
     }

@@ -13,6 +13,7 @@ using Policy.Infrastructure.Data;
 using Policy.Infrastructure.Messaging;
 using Shared.Errors;
 using Shared.Events;
+using Shared.InMemoryQueue;
 using Shared.Pagination;
 using Shared.Results;
 using Shared.Sorted;
@@ -23,7 +24,8 @@ internal sealed class PolicyService(
     IValidator<CreatePolicyModel> createPolicyModelValidator,
     IValidator<PolicyUpdateModel> updatePolicyModelValidator,
     PolicyDbContext policyDbContext,
-    IOptions<RabbitMqQueue> rabbitMqOptions) : IPolicyService
+    IOptions<RabbitMqQueue> rabbitMqOptions,
+    IEventBus eventBus) : IPolicyService
 {
     private readonly RabbitMqQueue _rabbitMqQueue = rabbitMqOptions.Value;
 
@@ -119,9 +121,7 @@ internal sealed class PolicyService(
         };
 
         policy.Status = PolicyStatus.Active;
-
-        await policyDbContext.SaveChangesAsync(cancellationToken);
-
+        
         var @event = new PolicyCreatedEvent
         {
             UserId = IdPlaceholder.CustomerId.ToString(),
@@ -131,18 +131,8 @@ internal sealed class PolicyService(
             StartDate = policy.StartDate,
             EndDate = policy.EndDate
         };
-
-        var outboxMessage = new OutboxMessage
-        {
-            Type = @event.EventType,
-            Content = JsonSerializer.Serialize(@event),
-            OccurredOn = DateTime.Now,
-        };
-
-        policyDbContext.OutboxMessages.Add(outboxMessage);
-        await policyDbContext.SaveChangesAsync(cancellationToken);
-
-        await transaction.CommitAsync(cancellationToken);
+        
+        await eventBus.PublishAsync(@event, cancellationToken);
 
         return Result<CreatePolicyResponse>.Success(new CreatePolicyResponse
         {
@@ -179,7 +169,7 @@ internal sealed class PolicyService(
                         && e.UserPayments.Any())
             .ExecuteUpdateAsync(up => up
                 .SetProperty(p => p.Status, _ => model.PolicyStatus), cancellationToken);
-        
+
         return affected == 0
             ? Result<UpdatePolicyResponse>.Failure("Something went wrong,try again")
             : Result<UpdatePolicyResponse>.Success(new UpdatePolicyResponse
